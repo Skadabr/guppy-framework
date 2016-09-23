@@ -1,0 +1,29 @@
+{
+  "name": "guppy",
+  "version": "1.0.1",
+  "description": "Guppy Framework",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nexode/guppy-framework.git"
+  },
+  "main": "index.js",
+  "author": "Karabutin Alex <karabutinalex@gmail.com>",
+  "license": "MIT",
+  "ava": {
+    "files": [
+      "dist/**/*.spec.js"
+    ],
+    "tap": false,
+    "concurrency": 1
+  },
+  "devDependencies": {
+    "ava": "^0.16.0",
+    "node-fetch": "^1.6.1"
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "easy-table": "^1.0.0",
+    "glob": "^7.0.6",
+    "reflect-metadata": "^0.1.8"
+  }
+}
