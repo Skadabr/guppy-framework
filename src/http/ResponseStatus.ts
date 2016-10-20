@@ -3,5 +3,6 @@ export enum ResponseStatus {
     Created = 201,
     Accepted = 202,
     NoContent = 204,
-    NotFound = 404
+    NotFound = 404,
+    InternalServerError = 500
 }

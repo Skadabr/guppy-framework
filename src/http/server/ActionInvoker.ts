@@ -1,5 +1,4 @@
 import { Request } from "../Request";
-import { RequestHandlerFunction } from "./HandlerResolver";
 import { Response } from "../Response";
 
 export class ActionInvoker {
@@ -10,7 +9,7 @@ export class ActionInvoker {
         this._argumentFactories.set(Request, request => request);
     }
 
-    public async invoke(request: Request, handler: RequestHandlerFunction, handlerArgumentClasses: Function[]): Promise<Response> {
+    public async invoke(request: Request, handler: Function, handlerArgumentClasses: Function[]): Promise<Response> {
         try {
             return await handler(...this.prepareArguments(request, handlerArgumentClasses));
         } catch (error) {

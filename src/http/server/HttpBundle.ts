@@ -9,6 +9,7 @@ import { HttpServer } from "./HttpServer";
 import { HttpServerCommand } from "./commands/HttpServerCommand";
 import { HttpRoutesCommand } from "./commands/HttpRoutesCommand";
 import { Presenter } from "../../presenter/Presenter";
+import { ReducerRegistry, RequestReducer } from "./ReducerRegistry";
 
 export class HttpBundle implements Bundle {
 
@@ -35,10 +36,21 @@ export class HttpBundle implements Bundle {
                 await container.get(HandlerResolver)
             ))
             .factory(ActionInvoker, async () => new ActionInvoker())
+            .factory(ReducerRegistry, async () => {
+                const reducerRegistry = new ReducerRegistry();
+                const serviceDefinitions = container.byTag("guppy.http.request_reducer");
+
+                for (const serviceDefinition of serviceDefinitions) {
+                    reducerRegistry.registerRequestReducer(<RequestReducer> await serviceDefinition.instance());
+                }
+
+                return reducerRegistry;
+            })
             .factory(HttpServer, async () => new HttpServer(
                 await container.get(HandlerResolver),
                 await container.get(ActionInvoker),
-                await container.get(Presenter)
+                await container.get(Presenter),
+                await container.get(ReducerRegistry)
             ))
             .factory(
                 HttpServerCommand,

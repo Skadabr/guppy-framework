@@ -1,5 +1,5 @@
 import { Response } from "../Response";
-import { HandlerResolver, RequestHandler, RequestHandlerFunction } from "./HandlerResolver";
+import { HandlerResolver, RequestHandler } from "./HandlerResolver";
 
 export const NotFoundHandler = async () => Response.notFound("Resource not found.");
 
@@ -7,7 +7,13 @@ export class DefaultHandlerResolver implements HandlerResolver {
 
     private _handlers: Map<RegExp, { [method: string]: Object }> = new Map();
 
-    public registerHandler(method: string, route: string, handler: RequestHandlerFunction, handlerArguments: Function[]) {
+    public registerHandler(
+        method: string,
+        route: string,
+        controller: Object,
+        methodName: string,
+        handlerArguments: Function[]
+    ) {
 
         const patternTemplate = route.replace(/\//g, "\\/").replace(/{[\w\d_-]+}/g, "([\\w\\u0430-\\u044f-_@]+)");
         const pattern = new RegExp(`^${patternTemplate}(?:$|\\?)`, "i");
@@ -24,7 +30,8 @@ export class DefaultHandlerResolver implements HandlerResolver {
         }
 
         this._handlers.get(pattern)[method] = {
-            handler: handler,
+            controller: controller,
+            methodName: methodName,
             route: route,
             parameterNames: parameterNames,
             handlerArguments: handlerArguments
@@ -38,9 +45,12 @@ export class DefaultHandlerResolver implements HandlerResolver {
         for (const pattern of this._handlers.keys()) {
             if ((matches = pattern.exec(url)) !== null && this._handlers.get(pattern).hasOwnProperty(method)) {
                 const route = this._handlers.get(pattern)[method];
+                const methodName = route["methodName"];
+                const controller = route["controller"];
                 return {
                     routeArguments: DefaultHandlerResolver.buildArgumentsMap(matches, route["parameterNames"]),
-                    handler: route["handler"],
+                    controller: controller,
+                    methodName: methodName,
                     handlerArguments: route["handlerArguments"]
                 };
             }
@@ -48,12 +58,14 @@ export class DefaultHandlerResolver implements HandlerResolver {
 
         return {
             routeArguments: {},
-            handler: NotFoundHandler,
+            controller: { notFound: NotFoundHandler },
+            methodName: "notFound",
             handlerArguments: []
         };
     }
 
     private static buildArgumentsMap(matches: string[], parameterNames: string[]) {
+
         let result = {};
 
         for (const keyIndex in parameterNames) {

@@ -1,7 +1,7 @@
 import { ResponseStatus, Response, Request } from "../../../http";
-import { RequestHandlerFunction, RequestHandler, HandlerResolver } from "../../../http/server";
+import { RequestHandler, HandlerResolver } from "../../../http/server";
 
-export const DEFAULT_HANDLER: RequestHandlerFunction = async (request: Request): Promise<Response> => {
+export const DEFAULT_HANDLER = async (request: Request): Promise<Response> => {
     if (request.url() == "/users/1") return Response.ok({ route: "user #1" });
     if (request.url() == "/users") {
         if (request.method() == "POST") {
@@ -28,13 +28,21 @@ export const DEFAULT_HANDLER: RequestHandlerFunction = async (request: Request):
 
 export class DefaultHandlerResolver implements HandlerResolver {
 
-    registerHandler(method: string, url: string, handler: RequestHandlerFunction): void {
+    public registerHandler(
+        method: string,
+        url: string,
+        controller: Object,
+        methodName: string,
+        handlerArguments: Function[]
+    ): void {
+
     }
 
     public resolve(method: string, url: string): RequestHandler {
         return {
             routeArguments: {},
-            handler: DEFAULT_HANDLER,
+            controller: { default: DEFAULT_HANDLER },
+            methodName: "default",
             handlerArguments: [Request]
         };
     }

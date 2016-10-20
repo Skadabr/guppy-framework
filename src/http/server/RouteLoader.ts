@@ -45,7 +45,8 @@ export class RouteLoader {
                 this._handlerResolver.registerHandler(
                     route['method'],
                     prefix + route['route'],
-                    request => controller[methodName].call(controller, request),
+                    controller,
+                    methodName,
                     handlerArguments
                 );
             }

@@ -5,6 +5,7 @@ import { HttpServer } from "../../../http/server/HttpServer";
 import { ActionInvoker } from "../../../http/server/ActionInvoker";
 import { DefaultHandlerResolver } from "./DefaultHandlerResolver";
 import { RootPresenter } from "../../../presenter/RootPresenter";
+import { ReducerRegistry } from "../../../http/server/ReducerRegistry";
 
 let httpServer: HttpServer;
 
@@ -12,7 +13,8 @@ test.beforeEach(() => {
     httpServer = new HttpServer(
         new DefaultHandlerResolver(),
         new ActionInvoker(),
-        new RootPresenter()
+        new RootPresenter(),
+        new ReducerRegistry()
     );
 });
 
@@ -131,13 +133,15 @@ test("starts a working http-server", async (t) => {
 });
 
 test("cannot start a http-server on a used port", async (t) => {
+
     await httpServer.listen(8912);
 
     t.throws(
         new HttpServer(
             new DefaultHandlerResolver(),
             new ActionInvoker(),
-            new RootPresenter()
+            new RootPresenter(),
+            new ReducerRegistry()
         ).listen(8912),
         "listen EADDRINUSE :::8912"
     );
@@ -146,9 +150,11 @@ test("cannot start a http-server on a used port", async (t) => {
 });
 
 test("ignores a terminating of a not started http-server", async () => {
+    
     await new HttpServer(
         new DefaultHandlerResolver(),
         new ActionInvoker(),
-        new RootPresenter()
+        new RootPresenter(),
+        new ReducerRegistry()
     ).terminate();
 });

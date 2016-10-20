@@ -37,10 +37,18 @@ export class MetadataRegistry {
         }
     }
 
-    public static classesByMetadataKey(metadataKey: string): Map<Function, Array<Object>> {
+    public static classesByMetadataKey(metadataKey: string): Map<Function, Object[]> {
         return this._metadataForClasses.has(metadataKey)
             ? this._metadataForClasses.get(metadataKey)
             : new Map();
+    }
+
+    public static memberMetadata(metadataKey: string, classDefinition: Function, memberName: string): Object[] {
+        if (!this._metadataForMembers.has(metadataKey)) return null;
+        if (!this._metadataForMembers.get(metadataKey).has(classDefinition)) return null;
+        if (!this._metadataForMembers.get(metadataKey).get(classDefinition).has(memberName)) return null;
+
+        return this._metadataForMembers.get(metadataKey).get(classDefinition).get(memberName);
     }
 
     public static putForMember(classDefinition: Function, memberName: string, metadataKey: string, metadata: Metadata) {

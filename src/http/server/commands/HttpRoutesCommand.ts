@@ -32,7 +32,7 @@ export class HttpRoutesCommand implements Command {
         }
 
         output
-            .text("Route list:")
+            .text("Rtscoute list:")
             .blank()
             .text(table.toString());
     }

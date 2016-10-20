@@ -3,7 +3,12 @@ import * as http from "http";
 import { HandlerResolver } from "./HandlerResolver";
 import { ActionInvoker } from "./ActionInvoker";
 import { HttpSession } from "./HttpSession";
-import {Presenter} from "../../presenter/Presenter";
+import { Presenter } from "../../presenter/Presenter";
+import { ReducerRegistry } from "./ReducerRegistry";
+import { Response } from "../Response";
+import { ResponseStatus } from "../ResponseStatus";
+import {RequestContext} from "./RequestContext";
+import {ValidationError} from "../../validation/ValidationError";
 
 export class HttpServer {
 
@@ -11,15 +16,18 @@ export class HttpServer {
     private _handlerResolver: HandlerResolver;
     private _actionInvoker: ActionInvoker;
     private _presenter: Presenter;
+    private _reducerRegistry: ReducerRegistry;
 
     public constructor(
         handlerResolver: HandlerResolver,
         actionInvoker: ActionInvoker,
-        presenter: Presenter
+        presenter: Presenter,
+        reducerRegistry: ReducerRegistry
     ) {
         this._handlerResolver = handlerResolver;
         this._actionInvoker = actionInvoker;
         this._presenter = presenter;
+        this._reducerRegistry = reducerRegistry;
         this._server = http.createServer((nativeRequest, nativeResponse) => {
 
             let chunks: Buffer[] = [];
@@ -43,16 +51,33 @@ export class HttpServer {
 
     private async handleRequest(httpSession: HttpSession): Promise<void> {
 
-        const handler = this._handlerResolver.resolve(httpSession.method, httpSession.url);
+        let response: Response;
 
-        httpSession.sendResponse(
-            await this._actionInvoker.invoke(
-                httpSession.createRequest(handler.routeArguments),
-                handler.handler,
+        try {
+            const handler = this._handlerResolver.resolve(httpSession.method, httpSession.url);
+
+            const requestContext = new RequestContext(handler.controller.constructor, handler.methodName);
+            
+            let request = httpSession.createRequest(handler.routeArguments);
+
+            for (const requestReducer of this._reducerRegistry.requestReducers()) {
+                request = await requestReducer.modify(request, requestContext);
+            }
+
+            response = await this._actionInvoker.invoke(
+                request,
+                handler.controller[handler.methodName].bind(handler.controller),
                 handler.handlerArguments
-            ),
-            this._presenter
-        );
+            );
+
+            for (const responseReducer of this._reducerRegistry.responseReducers()) {
+                response = await responseReducer.modify(response);
+            }
+        } catch (error) {
+            response = this.presentError(error);
+        }
+        
+        httpSession.sendResponse(response, this._presenter);
     }
 
     public listen(port: number): Promise<void> {
@@ -91,5 +116,25 @@ export class HttpServer {
             this._server.once('close', onClose);
             this._server.close();
         });
+    }
+
+    private presentError(error: Error): Response {
+
+        const children = [];
+
+        if (error.name == "ValidationError") {
+            for (const violation of (<ValidationError> error).violations) {
+                children.push(violation.message);
+            }
+        }
+
+        return Response.json(
+            ResponseStatus.InternalServerError,
+            {
+                error: error.name,
+                errorMessage: error.message,
+                children: children
+            }
+        );
     }
 }
