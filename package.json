@@ -6,19 +6,19 @@
     "type": "git",
     "url": "https://github.com/nexode/guppy-framework.git"
   },
+  "scripts": {
+    "build": "tsc",
+    "coverage": "tsc && istanbul cover _mocha -- --recursive ./dist/tests && remap-istanbul -i ./coverage/coverage.json -o ./coverage/html-report -t html",
+    "test": "tsc && mocha --recursive ./dist/tests"
+  },
   "main": "index.js",
   "author": "Karabutin Alex <karabutinalex@gmail.com>",
   "license": "MIT",
-  "ava": {
-    "files": [
-      "dist/**/*.spec.js"
-    ],
-    "tap": false,
-    "concurrency": 1
-  },
   "devDependencies": {
-    "ava": "^0.16.0",
-    "node-fetch": "^1.6.1"
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.2",
+    "node-fetch": "^1.6.1",
+    "remap-istanbul": "^0.7.0"
   },
   "dependencies": {
     "colors": "^1.1.2",

@@ -2,10 +2,12 @@
   "name": "guppy-framework",
   "dependencies": {},
   "globalDependencies": {
+    "assert": "registry:dt/assert#0.0.0+20160317120654",
     "colors": "registry:dt/colors#0.6.0-1+20160914114039",
     "easy-table": "registry:dt/easy-table#0.2.0+20160317120654",
     "glob": "registry:dt/glob#5.0.10+20160317120654",
     "minimatch": "registry:dt/minimatch#2.0.8+20160317120654",
+    "mocha": "registry:dt/mocha#2.2.5+20160720003353",
     "node": "registry:dt/node#6.0.0+20160914131736",
     "node-fetch": "registry:dt/node-fetch#0.0.0+20160711094047",
     "reflect-metadata": "registry:dt/reflect-metadata#0.0.0+20160630155503"
