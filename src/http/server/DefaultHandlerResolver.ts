@@ -24,7 +24,7 @@ export class DefaultHandlerResolver implements HandlerResolver {
 
         let parameterNames = route.match(/{[\w\d_-]+}/g);
         if (parameterNames !== null) {
-            parameterNames = parameterNames.map(entry => entry.replace(/[}{]+/g, ''));
+            parameterNames = parameterNames.map(entry => entry.replace(/[}{]+/g, ""));
         } else {
             parameterNames = [];
         }

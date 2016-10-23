@@ -7,8 +7,8 @@ import { Bundle } from "../core/Bundle";
 import { ServiceDefinition } from "../core/ServiceDefinition";
 import { ConsoleBundle } from "./ConsoleBundle";
 
-export const FRAMEWORK_VERSION = '1.0.0 pre-alpha';
-export const COMMAND_TAG = 'guppy.console.command';
+export const FRAMEWORK_VERSION = "1.0.3";
+export const COMMAND_TAG = "guppy.console.command";
 
 export class ConsoleApplication {
 
@@ -16,7 +16,7 @@ export class ConsoleApplication {
         private _bundles: Bundle[]
     ) {
     }
-    
+
     public async run(argv: string[]): Promise<Container> {
 
         let defaultApplication = new Application(
@@ -35,7 +35,7 @@ export class ConsoleApplication {
                 await commandRunner.process(argv);
 
                 return container;
-            })
+            });
     }
 
     private static availableCommands(container: Container): Map<string, ServiceDefinition> {
@@ -45,10 +45,10 @@ export class ConsoleApplication {
         commandDefinitions.push(
             new ServiceDefinition(
                 () => new HelpCommand(FRAMEWORK_VERSION, result),
-                { 'guppy.console.command': 'help' }
+                { "guppy.console.command": "help" }
             )
         );
-        
+
         for (let commandDefinition of commandDefinitions) {
             result.set(
                 <string> commandDefinition.tags()[COMMAND_TAG],

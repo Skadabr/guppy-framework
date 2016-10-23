@@ -9,7 +9,7 @@ export class DefaultConsoleOutput implements ConsoleOutput {
     }
 
     blank(): ConsoleOutput {
-        this.writer.writeLine('');
+        this.writer.writeLine("");
         return this;
     }
 

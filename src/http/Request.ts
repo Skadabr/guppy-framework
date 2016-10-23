@@ -51,7 +51,7 @@ export class Request {
     public get body(): {} {
         return this._body;
     }
-    
+
     public get remoteAddress(): string {
         return this._remoteAddress;
     }

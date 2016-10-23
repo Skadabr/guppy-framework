@@ -7,9 +7,9 @@ import { FORM_METADATA_KEY } from "./Form";
 import { Field } from "./Field";
 
 export class ValidationRequestReducer implements RequestReducer {
-    
+
     async modify(request: Request, requestContext: RequestContext): Promise<Request> {
-        
+
         const memberMetadata = MetadataRegistry.memberMetadata(
             FORM_METADATA_KEY,
             requestContext.controllerClass,

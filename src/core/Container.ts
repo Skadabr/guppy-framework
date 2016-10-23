@@ -31,13 +31,13 @@ export class Container {
         return this;
     }
 
-    public get<T>(c: Class<T>): Promise<T> {
+    public async get<T>(c: Class<T>): Promise<T> {
 
         if (!this._services.has(c)) {
             throw new ServiceNotRegistered(c.name);
         }
 
-        return this._services.get(c).instance();
+        return this._services.get(c).instance<T>();
     }
 
     public byTag(tagName: string): Array<ServiceDefinition> {

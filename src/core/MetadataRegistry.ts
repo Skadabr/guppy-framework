@@ -1,8 +1,8 @@
 export type Metadata = Object;
 
 export interface Member {
-    classDefinition: Function,
-    name: string
+    classDefinition: Function;
+    name: string;
 }
 
 export class MetadataRegistry {

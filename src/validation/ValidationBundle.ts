@@ -19,7 +19,7 @@ export class ValidationBundle extends Bundle {
 
     services(container: Container, config: ConfigState): void {
         container.factory(
-            ValidationRequestReducer, 
+            ValidationRequestReducer,
             () => new ValidationRequestReducer(),
             { "guppy.http.request_reducer": true }
         );

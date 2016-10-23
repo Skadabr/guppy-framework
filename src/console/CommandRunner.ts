@@ -5,7 +5,7 @@ import { ConsoleInputProcessor }    from "./ConsoleInputProcessor";
 import { ConsoleWriter }            from "./ConsoleWriter";
 import { DefaultConsoleOutput }     from "./DefaultConsoleOutput";
 
-export const DEFAULT_COMMAND = 'help';
+export const DEFAULT_COMMAND = "help";
 
 export class CommandRunner {
 
