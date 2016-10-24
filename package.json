@@ -8,16 +8,19 @@
   },
   "scripts": {
     "build": "tsc",
-    "coverage": "tsc && istanbul cover _mocha -- --recursive ./dist/tests && remap-istanbul -i ./coverage/coverage.json -o ./coverage/html-report -t html",
     "test": "tsc && mocha --require ts-node/register --recursive src/**/*.spec.ts --reporter dot",
-    "lint": "tslint ./src/**/*.ts"
+    "lint": "tslint ./src/**/*.ts",
+    "coverage": "tsc && istanbul --include-all-sources cover _mocha -- --recursive ./dist/tests && remap-istanbul -i ./coverage/coverage.json -o ./coverage/html-report -t html",
+    "coveralls": "npm run coverage -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "main": "index.js",
   "author": "Karabutin Alex <karabutinalex@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "coveralls": "^2.11.14",
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
+    "mocha-lcov-reporter": "^1.2.0",
     "node-fetch": "^1.6.1",
     "remap-istanbul": "^0.7.0",
     "ts-node": "^1.6.0",
