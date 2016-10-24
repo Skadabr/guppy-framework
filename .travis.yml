@@ -8,5 +8,6 @@ before_install:
   - "npm install -g typings"
 install:
   - "npm install"
+  - "npm link typescript"
   - "typings install"
   - "tsc"
