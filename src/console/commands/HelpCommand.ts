@@ -15,7 +15,7 @@ export class HelpCommand implements Command {
         return [];
     }
 
-    public execute(input: ConsoleInput, output: ConsoleOutput) {
+    public async execute(input: ConsoleInput, output: ConsoleOutput) {
         output
             .important(`Guppy Console - v${this.version}`)
             .blank()

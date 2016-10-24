@@ -11,7 +11,7 @@ export class Request {
         private _body: any,
         private _route: ParameterSet,
         private _remoteAddress: string,
-        private _query: ParameterSet
+        private _query?: ParameterSet
     ) {
         this._query = this._query || {};
     }

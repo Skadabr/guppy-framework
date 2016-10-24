@@ -12,23 +12,22 @@ export class HttpServerCommand implements Command {
     public constructor(
         private _httpServer: HttpServer,
         private _routeLoader: RouteLoader,
-        private _serverPort: number | null
+        private _serverPort?: number
     ) {
     }
 
-    public inputArguments(): Array<string> {
-        return [
-            'directory'
-        ];
+    public inputArguments(): string[] {
+        return [];
     }
 
-    public async execute(input: ConsoleInput, output: ConsoleOutput) {
+    public execute(input: ConsoleInput, output: ConsoleOutput) {
 
         let serverPort: number = input.optionAsInt('port') || this._serverPort || DEFAULT_HTTP_PORT;
 
         this._routeLoader.load();
-        this._httpServer
+
+        return this._httpServer
             .listen(serverPort)
-            .then(() => console.log(`Server has been started on ${serverPort} port.`));
+            .then(() => output.info(`Server has been started on ${serverPort} port.`));
     }
 }

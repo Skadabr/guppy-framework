@@ -1,7 +1,6 @@
 import assert = require('assert');
 
-import { Presenter } from "../../presenter/Presenter";
-import { RootPresenter } from "../../presenter/RootPresenter";
+import { Presenter, RootPresenter } from "../../presenter";
 import { User } from "./User";
 
 class UserPresenter {

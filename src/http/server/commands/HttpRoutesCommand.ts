@@ -23,6 +23,12 @@ export class HttpRoutesCommand implements Command {
     public async execute(input: ConsoleInput, output: ConsoleOutput) {
 
         const table = new Table();
+        const routes = this.getRouteList();
+
+        if (routes.length < 1) {
+            output.text("No registered routes.");
+            return;
+        }
 
         for (const route of this.getRouteList()) {
             table.cell("Method", route.method);
@@ -32,7 +38,7 @@ export class HttpRoutesCommand implements Command {
         }
 
         output
-            .text("Rtscoute list:")
+            .text("Route list:")
             .blank()
             .text(table.toString());
     }
@@ -58,9 +64,13 @@ export class HttpRoutesCommand implements Command {
             const prefix = controllerPrefixes[controllerName] || "";
 
             for (const route of routes.get(handler)) {
+                let url = prefix.length > 0
+                    ? prefix + (route["route"] !== "/" ? route["route"] : "")
+                    : route["route"];
+
                 routeList.push({
-                    method: route['method'],
-                    url: prefix + route['route'],
+                    method: route["method"],
+                    url: url,
                     controller: handler.classDefinition,
                     action: handler.name
                 });

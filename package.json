@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "unit": "tsc && mocha --require ts-node/register --recursive src/**/*.spec.ts --reporter dot",
+    "unit": "tsc && mocha --require ts-node/register --reporter dot --recursive src/**/*.spec.ts",
     "lint": "tslint ./src/**/*.ts",
     "test": "npm run unit && npm run lint",
     "coverage": "tsc && istanbul --include-all-sources cover _mocha -- --recursive ./dist/tests",
