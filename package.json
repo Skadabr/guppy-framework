@@ -11,7 +11,7 @@
     "test": "tsc && mocha --require ts-node/register --recursive src/**/*.spec.ts --reporter dot",
     "lint": "tslint ./src/**/*.ts",
     "coverage": "tsc && istanbul --include-all-sources cover _mocha -- --recursive ./dist/tests && remap-istanbul -i ./coverage/coverage.json -o ./coverage/html-report -t html",
-    "coveralls": "npm run coverage -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
+    "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls"
   },
   "main": "index.js",
   "author": "Karabutin Alex <karabutinalex@gmail.com>",
