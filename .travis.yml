@@ -10,6 +10,6 @@ install:
   - "npm install"
   - "npm link typescript"
   - "typings install"
-  - "tsc"
+  - "npm run build"
 after_success:
   - "npm run coveralls"
