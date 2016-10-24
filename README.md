@@ -1,6 +1,6 @@
 # Guppy
 [![Travis CI](https://img.shields.io/travis/nexode/guppy-framework.svg)](https://travis-ci.org/nexode/guppy-framework)
-[![Coveralls](https://img.shields.io/coveralls/nexode/guppy-framework.svg)](https://github.com/nexode/guppy-framework)
+[![Coverage Status](https://coveralls.io/repos/github/nexode/guppy-framework/badge.svg?branch=master)](https://coveralls.io/github/nexode/guppy-framework?branch=master)
 [![License](https://img.shields.io/npm/l/guppy.svg)]([https://www.npmjs.com/package/guppy)
 [![Join the chat at https://gitter.im/guppy-framework/guppy](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/guppy-framework/guppy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
