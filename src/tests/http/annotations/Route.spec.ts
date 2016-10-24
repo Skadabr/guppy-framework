@@ -1,7 +1,7 @@
 import assert = require('assert');
 
 import { MetadataRegistry } from "../../../core";
-import { Route } from "../../../http/annotations";
+import { Route } from "../../../http";
 
 describe('guppy.http.annotations.Route', () => {
 

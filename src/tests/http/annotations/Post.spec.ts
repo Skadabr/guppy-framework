@@ -1,4 +1,4 @@
-import { Post, Route } from "../../../http/annotations";
+import { Post, Route } from "../../../http";
 import assert = require("assert");
 
 describe("guppy.http.annotations.Post", () => {

@@ -9,6 +9,18 @@ Guppy is a platform for micro-service development on TypeScript.
 
 [Here](https://github.com/nexode/guppy-boilerplate) you can get a boilerplate.
 
+```typescript
+import { Get, Response } from "guppy/http";
+
+export class UserController {
+
+    @Get("/greeting")
+    public greeting() {
+        return Response.ok({ greeting: "Hello Guppy!" });
+    }
+}
+```
+
 ## Features
 
 * Dependency Injection Container
