@@ -19,6 +19,6 @@ export class ConsoleBundle implements Bundle {
     }
 
     services(container: Container, config: ConfigState): void {
-        container.factory(ConsoleWriter, async () => new DefaultConsoleWriter());
+        container.factory(ConsoleWriter, async () => new DefaultConsoleWriter(process.stdout));
     }
 }

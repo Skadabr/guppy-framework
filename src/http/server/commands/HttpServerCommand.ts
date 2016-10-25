@@ -30,4 +30,8 @@ export class HttpServerCommand implements Command {
             .listen(serverPort)
             .then(() => output.info(`Server has been started on ${serverPort} port.`));
     }
+
+    public get serverPort(): number {
+        return this._serverPort;
+    }
 }

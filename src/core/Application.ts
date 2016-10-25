@@ -13,7 +13,6 @@ export class Application {
 
         const container = new Container();
 
-        container.instance(Container, container);
         container.factory(BundleLoader, async () => new BundleLoader(
             await container.get(Container)
         ));

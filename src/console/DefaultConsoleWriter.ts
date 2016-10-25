@@ -1,9 +1,13 @@
 import { ConsoleWriter } from "./ConsoleWriter";
 
-export class DefaultConsoleWriter implements ConsoleWriter {
+export class DefaultConsoleWriter extends ConsoleWriter {
+
+    constructor(private _stdout: NodeJS.WritableStream) {
+        super();
+    }
 
     write(data: string): void {
-        process.stdout.write(data);
+        this._stdout.write(data);
     }
 
     writeLine(data: string): void {

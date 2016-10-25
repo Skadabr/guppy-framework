@@ -3,7 +3,7 @@ import { HandlerResolver, RequestHandler } from "./HandlerResolver";
 
 export const NotFoundHandler = async () => Response.notFound("Resource not found.");
 
-export class DefaultHandlerResolver implements HandlerResolver {
+export class DefaultHandlerResolver extends HandlerResolver {
 
     private _handlers: Map<RegExp, { [method: string]: Object }> = new Map();
 

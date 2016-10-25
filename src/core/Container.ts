@@ -11,6 +11,10 @@ export class Container {
 
     private _services: Map<Class<any>, ServiceDefinition> = new Map();
 
+    public constructor() {
+        this.instance(Container, this);
+    }
+
     public factory(service: Function, serviceFactory: ServiceFactory, tags?: TagSet) {
 
         this._services.set(
