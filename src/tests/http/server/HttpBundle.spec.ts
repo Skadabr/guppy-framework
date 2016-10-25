@@ -7,11 +7,17 @@ import {
     ReducerRegistry,
     HttpServer
 } from "../../../http/server";
+
+import { ConsoleOutput } from "../../../console"; 
 import { HttpServerCommand } from "../../../http/server/commands/HttpServerCommand";
 import { HttpRoutesCommand } from "../../../http/server/commands/HttpRoutesCommand";
 import { Presenter, RootPresenter } from "../../../presenter";
 
 import assert = require("assert");
+
+function mock<T>(data?: Object): T {
+    return <T> (data || {});
+}
 
 describe("guppy.http.server.HttpBundle", () => {
 
@@ -29,6 +35,10 @@ describe("guppy.http.server.HttpBundle", () => {
         assert.equal(httpBundle.name(), "guppy.http");
     });
 
+    it("does not have any autoload data", () => {
+        assert.deepEqual(httpBundle.autoload(), []);
+    });
+
     it("configurates the application", () => {
         const configState = new ConfigState();
         const config = new DefaultConfig(configState);
@@ -43,7 +53,20 @@ describe("guppy.http.server.HttpBundle", () => {
         const configState = new ConfigState();
         const container = new Container();
 
-        container.instance(Presenter, new RootPresenter())
+        container.instance(Presenter, new RootPresenter());
+        container.instance(ConsoleOutput, mock<ConsoleOutput>());
+
+        class MyReducer {}
+
+        container.instance(
+            MyReducer, 
+            {
+                instance: () => new MyReducer(),
+            },
+            {
+                "guppy.http.request_reducer": true
+            }
+        );
 
         httpBundle.services(container, configState);
 
@@ -63,6 +86,7 @@ describe("guppy.http.server.HttpBundle", () => {
         const container = new Container();
 
         container.instance(Presenter, new RootPresenter())
+        container.instance(ConsoleOutput, mock<ConsoleOutput>());
 
         process.env.APP_PORT = 2310;
         httpBundle.config(config);

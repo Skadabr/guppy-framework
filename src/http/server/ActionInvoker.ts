@@ -1,11 +1,12 @@
 import { Request } from "../Request";
 import { Response } from "../Response";
+import { ConsoleOutput } from "../../console";
 
 export class ActionInvoker {
 
     private _argumentFactories: Map<Function, (Request) => any> = new Map();
 
-    public constructor() {
+    public constructor(private _consoleOutput: ConsoleOutput) {
         this._argumentFactories.set(Request, request => request);
     }
 
@@ -13,7 +14,7 @@ export class ActionInvoker {
         try {
             return await handler(...this.prepareArguments(request, handlerArgumentClasses));
         } catch (error) {
-            console.error(error.stack);
+            this._consoleOutput.error(error.stack.toString());
             return Response.json(500, { errorMessage: "Internal Server Error" });
         }
     }

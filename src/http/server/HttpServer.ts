@@ -40,7 +40,6 @@ export class HttpServer {
 
                     this.handleRequest(httpSession)
                         .catch(error => {
-                            console.error(error);
                             httpSession.abort("Bad request.", 400);
                         });
                 });
@@ -101,19 +100,7 @@ export class HttpServer {
 
     public terminate(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-
-            const onError = error => {
-                this._server.removeListener('close', onClose);
-                reject(error);
-            };
-
-            const onClose = () => {
-                this._server.removeListener('error', onError);
-                resolve();
-            };
-
-            this._server.once('error', onError);
-            this._server.once('close', onClose);
+            this._server.once('close', () => resolve());
             this._server.close();
         });
     }

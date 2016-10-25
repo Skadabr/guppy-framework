@@ -5,3 +5,4 @@ export * from "./HttpServer";
 export * from "./RouteLoader";
 export * from "./HttpBundle";
 export * from "./ActionInvoker";
+export * from "./HttpSession";

@@ -1,13 +1,13 @@
 import { Container } from "./Container";
 import { Bundle } from "./Bundle";
 
-import * as glob from "glob";
 import { ConfigState, DefaultConfig } from "./Config";
 
 export class BundleLoader {
 
     constructor(
-        private _container: Container
+        private _container: Container,
+        private _glob
     ) {
     }
 
@@ -30,7 +30,7 @@ export class BundleLoader {
 
     private async loadDirectory(directory: string) {
         return new Promise((resolve, reject) => {
-            glob(
+            this._glob(
                 `${directory}/*.js`,
                 { },
                 (error, files: string[]) => {

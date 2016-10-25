@@ -81,7 +81,7 @@ export class HttpSession {
 
         this.abort("Unsupported Content-Type.", 400);
 
-        throw new Error(`Unsupported Content-Type. Given: ${contentType}`);
+        throw new Error(`Unsupported Content-Type. Given: ${contentType}.`);
     }
 
     public abort(message: string, statusCode: number) {

@@ -1,6 +1,7 @@
 import { Container } from "./Container";
 import { Bundle } from "./Bundle";
 import { BundleLoader } from "./BundleLoader";
+import * as glob from "glob";
 
 export class Application {
 
@@ -14,7 +15,8 @@ export class Application {
         const container = new Container();
 
         container.factory(BundleLoader, async () => new BundleLoader(
-            await container.get(Container)
+            await container.get(Container),
+            glob
         ));
 
         return container;

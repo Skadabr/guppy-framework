@@ -10,7 +10,7 @@ export function Form(...fields: Field[]): Function {
         classDefinition = classDefinition instanceof Function ? classDefinition : classDefinition.constructor;
 
         if (!propertyName) {
-            throw new Error("Annotation @Form doesn't support using with classes");
+            throw new Error("Annotation @Form doesn't support using with classes.");
         }
 
         MetadataRegistry.putForMember(
