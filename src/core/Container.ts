@@ -1,5 +1,5 @@
 import { ServiceNotRegistered } from "./ServiceNotRegistered";
-import { ServiceFactory, ServiceDefinition, TagSet } from "./ServiceDefinition";
+import { ServiceDecorator, ServiceFactory, ServiceDefinition, TagSet } from "./ServiceDefinition";
 
 export interface ClassConstructor<T> extends Function {
     new (...args: any[]): T;
@@ -42,6 +42,17 @@ export class Container {
         }
 
         return this._services.get(c).instance<T>();
+    }
+
+    public extend<T>(c: Class<T>, decorator: ServiceDecorator<T>) {
+
+        if (!this._services.has(c)) {
+            throw new ServiceNotRegistered(c.name);
+        }
+
+        const serviceDefinition = this._services.get(c);
+
+        serviceDefinition.registerDecorator(decorator);
     }
 
     public byTag(tagName: string): Array<ServiceDefinition> {

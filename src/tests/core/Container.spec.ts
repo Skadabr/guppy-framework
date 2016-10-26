@@ -46,7 +46,7 @@ describe("guppy.core.Container", () => {
         class FirstService { }
         class SecondService { }
         class ThirdService { }
- 
+
         const container = new Container();
 
         container.factory(FirstService, () => new FirstService(), { odd: true });
@@ -64,5 +64,71 @@ describe("guppy.core.Container", () => {
                 assert.ok(services[1] instanceof ThirdService);
                 done();
             });
+    });
+
+    it("extends an existent service", () => {
+
+        class FirstService {
+
+            public constructor(private _sum?: number) {
+                this._sum = this._sum || 0;
+            }
+
+            public add(value: number) {
+                this._sum += value;
+            }
+
+            public sum(): number {
+                return this._sum;
+            }
+        }
+
+        const container = new Container();
+
+        container.factory(FirstService, () => new FirstService());
+
+        container.extend(FirstService, (firstService: FirstService) => {
+            firstService.add(2);
+            return firstService;
+        });
+
+        container.extend(FirstService, (firstService: FirstService) => {
+            firstService.add(3);
+            return firstService;
+        });
+
+        return container.get(FirstService)
+            .then((firstService: FirstService) => {
+                assert.ok(firstService instanceof FirstService);
+                assert.equal(firstService.sum(), 2 + 3);
+            });
+    });
+
+    it("throws on extending of non existent service", () => {
+
+        class FirstService {
+
+            public constructor(private _sum?: number) {
+                this._sum = this._sum || 0;
+            }
+
+            public add(value: number) {
+                this._sum += value;
+            }
+
+            public sum(): number {
+                return this._sum;
+            }
+        }
+
+        const container = new Container();
+
+        assert.throws(
+            () => container.extend(FirstService, (firstService: FirstService) => {
+                firstService.add(2);
+                return firstService;
+            }),
+            /ServiceNotRegistered: Service "FirstService" is not registered./
+        );
     });
 });
