@@ -2,8 +2,7 @@ import { Bundle } from "../core/Bundle";
 import { Container } from "../core/Container";
 import { Config, ConfigState } from "../core/Config";
 
-import { ConsoleWriter } from "./ConsoleWriter";
-import { DefaultConsoleWriter } from "./DefaultConsoleWriter";
+import { ConsoleWriter, ConsoleOutput, DefaultConsoleWriter, DefaultConsoleOutput } from ".";
 
 export class ConsoleBundle implements Bundle {
 
@@ -20,5 +19,8 @@ export class ConsoleBundle implements Bundle {
 
     services(container: Container, config: ConfigState): void {
         container.factory(ConsoleWriter, async () => new DefaultConsoleWriter(process.stdout));
+        container.factory(ConsoleOutput, async () => new DefaultConsoleOutput(
+            await container.get(ConsoleWriter)
+        ));
     }
 }

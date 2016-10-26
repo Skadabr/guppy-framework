@@ -3,9 +3,10 @@ import { ConsoleWriter } from "./ConsoleWriter";
 
 import * as colors from "colors";
 
-export class DefaultConsoleOutput implements ConsoleOutput {
+export class DefaultConsoleOutput extends ConsoleOutput {
 
     constructor(private writer: ConsoleWriter) {
+        super();
     }
 
     blank(): ConsoleOutput {

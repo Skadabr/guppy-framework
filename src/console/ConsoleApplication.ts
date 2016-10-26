@@ -1,5 +1,5 @@
 import { HelpCommand } from "./commands/HelpCommand";
-import { ConsoleWriter } from "./ConsoleWriter";
+import { ConsoleOutput } from ".";
 import { CommandRunner } from "./CommandRunner";
 import { Application } from "../core/Application";
 import { Container } from "../core/Container";
@@ -29,7 +29,7 @@ export class ConsoleApplication {
 
                 const commandRunner = new CommandRunner(
                     ConsoleApplication.availableCommands(container),
-                    await container.get(ConsoleWriter)
+                    await container.get(ConsoleOutput)
                 );
 
                 await commandRunner.process(argv);
