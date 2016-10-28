@@ -1,18 +1,13 @@
 export type ServiceFactory = Function;
-export type TagValue = any;
-export type TagSet = { [tagName: string]: TagValue };
 
-export type ServiceDecorator<T> = (T) => T | Promise<T>;
+export type ServiceDecorator<T> = (T) => T | Promise<T> | any;
 
 export class ServiceDefinition {
 
     private _instance: Object | null = null;
     private _decorators: ServiceDecorator<any>[] = [];
 
-    public constructor(
-        private _factory: ServiceFactory,
-        private _tags: TagSet
-    ) {
+    public constructor(private _factory: ServiceFactory) {
     }
 
     public async instance<T>(): Promise<T> {
@@ -20,18 +15,16 @@ export class ServiceDefinition {
 
             let instance = await this._factory();
 
+            let result;
             for (const decorate of this._decorators) {
-                instance = await decorate(instance);
+                result = await decorate(instance);
+                if (result instanceof instance.constructor) instance = result;
             }
 
             this._instance = instance;
         }
 
         return <T> this._instance;
-    }
-
-    public tags(): TagSet {
-        return this._tags;
     }
 
     public registerDecorator<T>(decorator: ServiceDecorator<T>) {

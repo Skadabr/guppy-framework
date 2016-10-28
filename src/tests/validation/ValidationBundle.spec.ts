@@ -2,6 +2,7 @@ import assert = require("assert");
 
 import { ConfigState, DefaultConfig, Container } from "../../core";
 import { ValidationBundle, ValidationRequestReducer } from "../../validation";
+import { ReducerRegistry } from "../../http/server/ReducerRegistry";
 
 describe("guppy.validation.ValidationBundle", () => {
 
@@ -9,7 +10,7 @@ describe("guppy.validation.ValidationBundle", () => {
 
     before(() => {
         validationBundle = new ValidationBundle();
-    })
+    });
 
     it("can be instantiated", () => {
         assert.ok(validationBundle instanceof ValidationBundle);
@@ -33,12 +34,21 @@ describe("guppy.validation.ValidationBundle", () => {
     it("registers a ConsoleWriter", () => {
         const configState = new ConfigState();
         const container = new Container();
+        const reducerRegistry = new ReducerRegistry();
+
+        container.instance(ReducerRegistry, reducerRegistry);
 
         validationBundle.services(container, configState);
 
-        return container.get(ValidationRequestReducer)
+        return container
+            .get(ValidationRequestReducer)
             .then((validationRequestReducer: ValidationRequestReducer) => {
                 assert.ok(validationRequestReducer instanceof ValidationRequestReducer);
+
+                return container.get(ReducerRegistry);
+            })
+            .then((reducerRegistry: ReducerRegistry) => {
+                assert.ok(reducerRegistry instanceof ReducerRegistry);
             });
     });
 

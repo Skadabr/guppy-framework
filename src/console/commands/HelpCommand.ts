@@ -1,13 +1,13 @@
 import { Command }          from "../Command";
 import { ConsoleInput }     from "../ConsoleInput";
 import { ConsoleOutput }    from "../ConsoleOutput";
-import { ServiceDefinition } from "../../core/ServiceDefinition";
+import { CommandRegistry }   from "../CommandRegistry";
 
 export class HelpCommand implements Command {
 
     public constructor(
         private version: string,
-        private availableCommands: Map<string, ServiceDefinition>
+        private commandRegistry: CommandRegistry
     ) {
     }
 
@@ -24,8 +24,11 @@ export class HelpCommand implements Command {
             .blank()
             .text('Available commands:');
 
-        this.availableCommands.forEach((serviceDefinition: ServiceDefinition, commandKey: string) => {
+        const commands = this.commandRegistry.all();
+
+        let commandKey;
+        for (commandKey in commands) {
             output.message(`\t${commandKey}`)
-        });
+        }
     }
 }

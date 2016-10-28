@@ -2,6 +2,7 @@ import { Bundle } from "../core/Bundle";
 import { Config, ConfigState } from "../core/Config";
 import { Container } from "../core/Container";
 import { ValidationRequestReducer } from "./ValidationRequestReducer";
+import {ReducerRegistry} from "../http/server/ReducerRegistry";
 
 export class ValidationBundle extends Bundle {
 
@@ -18,10 +19,16 @@ export class ValidationBundle extends Bundle {
     }
 
     services(container: Container, config: ConfigState): void {
-        container.factory(
-            ValidationRequestReducer,
-            () => new ValidationRequestReducer(),
-            { "guppy.http.request_reducer": true }
-        );
+        container
+            .factory(
+                ValidationRequestReducer,
+                () => new ValidationRequestReducer()
+            )
+            .extend(
+                ReducerRegistry,
+                async (reducerRegistry: ReducerRegistry) => reducerRegistry.registerRequestReducer(
+                    await container.get(ValidationRequestReducer)
+                )
+            );
     }
 }

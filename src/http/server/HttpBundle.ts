@@ -11,6 +11,7 @@ import { HttpRoutesCommand } from "./commands/HttpRoutesCommand";
 import { Presenter } from "../../presenter/Presenter";
 import { ReducerRegistry, RequestReducer } from "./ReducerRegistry";
 import { ConsoleOutput } from "../../console";
+import {CommandRegistry} from "../../console/CommandRegistry";
 
 export class HttpBundle implements Bundle {
 
@@ -39,16 +40,7 @@ export class HttpBundle implements Bundle {
             .factory(ActionInvoker, async () => new ActionInvoker(
                 await container.get(ConsoleOutput)
             ))
-            .factory(ReducerRegistry, async () => {
-                const reducerRegistry = new ReducerRegistry();
-                const serviceDefinitions = container.byTag("guppy.http.request_reducer");
-
-                for (const serviceDefinition of serviceDefinitions) {
-                    reducerRegistry.registerRequestReducer(<RequestReducer> await serviceDefinition.instance());
-                }
-
-                return reducerRegistry;
-            })
+            .factory(ReducerRegistry, () => new ReducerRegistry())
             .factory(HttpServer, async () => new HttpServer(
                 await container.get(HandlerResolver),
                 await container.get(ActionInvoker),
@@ -63,15 +55,20 @@ export class HttpBundle implements Bundle {
                     config.has("guppy.http.serverPort")
                         ? parseInt(<string> config.get("guppy.http.serverPort"))
                         : null
-                ),
-                { "guppy.console.command": "http:server" }
+                )
             )
             .factory(
                 HttpRoutesCommand,
                 async () => new HttpRoutesCommand(
                     await container.get(Container)
-                ),
-                { "guppy.console.command": "http:routes" }
+                )
+            )
+            .extend(
+                CommandRegistry,
+                (commandRegistry: CommandRegistry) => {
+                    commandRegistry.register("http:server", HttpServerCommand);
+                    commandRegistry.register("http:routes", HttpRoutesCommand);
+                }
             );
     }
 }

@@ -14,6 +14,7 @@ import { HttpRoutesCommand } from "../../../http/server/commands/HttpRoutesComma
 import { Presenter, RootPresenter } from "../../../presenter";
 
 import assert = require("assert");
+import {CommandRegistry} from "../../../console/CommandRegistry";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -53,20 +54,9 @@ describe("guppy.http.server.HttpBundle", () => {
         const configState = new ConfigState();
         const container = new Container();
 
+        container.instance(CommandRegistry, new CommandRegistry());
         container.instance(Presenter, new RootPresenter());
         container.instance(ConsoleOutput, mock<ConsoleOutput>());
-
-        class MyReducer {}
-
-        container.instance(
-            MyReducer, 
-            {
-                instance: () => new MyReducer(),
-            },
-            {
-                "guppy.http.request_reducer": true
-            }
-        );
 
         httpBundle.services(container, configState);
 
@@ -78,14 +68,26 @@ describe("guppy.http.server.HttpBundle", () => {
         assert.ok(await container.get(HttpServer) instanceof HttpServer);
         assert.ok(await container.get(HttpServerCommand) instanceof HttpServerCommand);
         assert.ok(await container.get(HttpRoutesCommand) instanceof HttpRoutesCommand);
+
+        return container
+            .get(CommandRegistry)
+            .then((commandRegistry: CommandRegistry) => {
+                const allRegisteredCommands = commandRegistry.all();
+                assert.ok(allRegisteredCommands.hasOwnProperty("http:server"));
+                assert.equal(allRegisteredCommands["http:server"], HttpServerCommand);
+                assert.ok(allRegisteredCommands.hasOwnProperty("http:routes"));
+                assert.equal(allRegisteredCommands["http:routes"], HttpRoutesCommand);
+            });
     });
 
     it("loads a port for http server from config", async () => {
         const configState = new ConfigState();
         const config = new DefaultConfig(configState);
         const container = new Container();
+        const commandRegistry = new CommandRegistry();
 
-        container.instance(Presenter, new RootPresenter())
+        container.instance(CommandRegistry, commandRegistry);
+        container.instance(Presenter, new RootPresenter());
         container.instance(ConsoleOutput, mock<ConsoleOutput>());
 
         process.env.APP_PORT = 2310;

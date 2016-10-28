@@ -1,13 +1,9 @@
 import { HelpCommand } from "./commands/HelpCommand";
-import { ConsoleOutput } from ".";
-import { CommandRunner } from "./CommandRunner";
-import { Application } from "../core/Application";
-import { Container } from "../core/Container";
-import { Bundle } from "../core/Bundle";
-import { ServiceDefinition } from "../core/ServiceDefinition";
-import { ConsoleBundle } from "./ConsoleBundle";
+import { ConsoleOutput, CommandRunner, ConsoleBundle } from ".";
+import { Application, Container, Bundle, ServiceDefinition } from "../core";
+import { VERSION } from "..";
+import { CommandRegistry } from "./CommandRegistry";
 
-export const FRAMEWORK_VERSION = "1.0.3";
 export const COMMAND_TAG = "guppy.console.command";
 
 export class ConsoleApplication {
@@ -28,7 +24,8 @@ export class ConsoleApplication {
             .then(async (container: Container) => {
 
                 const commandRunner = new CommandRunner(
-                    ConsoleApplication.availableCommands(container),
+                    container,
+                    await container.get(CommandRegistry),
                     await container.get(ConsoleOutput)
                 );
 
@@ -36,26 +33,5 @@ export class ConsoleApplication {
 
                 return container;
             });
-    }
-
-    private static availableCommands(container: Container): Map<string, ServiceDefinition> {
-        let result: Map<string, ServiceDefinition> = new Map();
-        let commandDefinitions: ServiceDefinition[] = container.byTag(COMMAND_TAG);
-
-        commandDefinitions.push(
-            new ServiceDefinition(
-                () => new HelpCommand(FRAMEWORK_VERSION, result),
-                { "guppy.console.command": "help" }
-            )
-        );
-
-        for (let commandDefinition of commandDefinitions) {
-            result.set(
-                <string> commandDefinition.tags()[COMMAND_TAG],
-                commandDefinition
-            );
-        }
-
-        return result;
     }
 }

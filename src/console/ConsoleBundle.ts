@@ -1,8 +1,10 @@
 import { Bundle } from "../core/Bundle";
 import { Container } from "../core/Container";
 import { Config, ConfigState } from "../core/Config";
+import { VERSION } from "..";
 
-import { ConsoleWriter, ConsoleOutput, DefaultConsoleWriter, DefaultConsoleOutput } from ".";
+import { CommandRegistry, ConsoleWriter, ConsoleOutput, DefaultConsoleWriter, DefaultConsoleOutput } from ".";
+import { HelpCommand } from "./commands/HelpCommand";
 
 export class ConsoleBundle implements Bundle {
 
@@ -18,9 +20,25 @@ export class ConsoleBundle implements Bundle {
     }
 
     services(container: Container, config: ConfigState): void {
-        container.factory(ConsoleWriter, async () => new DefaultConsoleWriter(process.stdout));
-        container.factory(ConsoleOutput, async () => new DefaultConsoleOutput(
-            await container.get(ConsoleWriter)
-        ));
+        container
+            .factory(
+                CommandRegistry, () => new CommandRegistry()
+            )
+            .factory(
+                HelpCommand,
+                async () => new HelpCommand(VERSION, await container.get(CommandRegistry))
+            )
+            .extend(
+                CommandRegistry,
+                (commandRegistry: CommandRegistry) => commandRegistry.register("help", HelpCommand)
+            )
+            .factory(
+                ConsoleWriter,
+                async () => new DefaultConsoleWriter(process.stdout)
+            )
+            .factory(
+                ConsoleOutput,
+                async () => new DefaultConsoleOutput(await container.get(ConsoleWriter))
+            );
     }
 }

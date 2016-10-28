@@ -63,17 +63,24 @@ describe("guppy.presenter.PresenterBundle", () => {
         const configState = new ConfigState();
         const container = new Container();
 
-        container.factory(
-            UserPresenter, 
-            () => new UserPresenter(),
-            { "guppy.presenter": User }
-        );
-
         presenterBundle.services(container, configState);
+
+        container
+            .factory(
+                UserPresenter,
+                () => new UserPresenter()
+            )
+            .extend(
+                Presenter,
+                async (presenter: RootPresenter) => presenter.register(
+                    User,
+                    await container.get(UserPresenter)
+                )
+            );
 
         return container
             .get(Presenter)
-            .then((presenter: Presenter) => {
+            .then(presenter => {
                 assert.equal(
                     presenter.present(new User(8, "Alex")), 
                     JSON.stringify({ id: 8, fullName: "Alex" })

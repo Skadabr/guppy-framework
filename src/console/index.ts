@@ -1,5 +1,6 @@
 export * from "./Command";
 export * from "./CommandRunner";
+export * from "./CommandRegistry";
 export * from "./ConsoleApplication";
 export * from "./ConsoleBundle";
 export * from "./ConsoleInput";

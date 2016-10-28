@@ -39,9 +39,7 @@ export class HttpServer {
                     const httpSession = new HttpSession(nativeRequest, nativeResponse, nativeRequestBody);
 
                     this.handleRequest(httpSession)
-                        .catch(error => {
-                            httpSession.abort("Bad request.", 400);
-                        });
+                        .catch(() => httpSession.abort("Bad request.", 400));
                 });
         });
 

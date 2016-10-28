@@ -1,8 +1,7 @@
 import assert = require("assert");
 
-import { ServiceDefinition } from "../../../core";
 import { HelpCommand } from "../../../console/commands/HelpCommand";
-import { ConsoleInput, ConsoleOutput } from "../../../console";
+import { ConsoleInput, ConsoleOutput, CommandRegistry } from "../../../console";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -12,16 +11,16 @@ describe("guppy.console.commands.HelpCommand", () => {
 
     it("does not accept any arguments", () => {
         const version = "1.0.0";
-        const availableCommands: Map<string, ServiceDefinition> = new Map();
+        const commandRegistry = new CommandRegistry();
 
-        const helpCommand = new HelpCommand(version, availableCommands);
+        const helpCommand = new HelpCommand(version, commandRegistry);
 
         assert.deepEqual(helpCommand.inputArguments(), []);
     });
 
     it("displays all available commands", () => {
         const version = "1.0.0";
-        const availableCommands: Map<string, ServiceDefinition> = new Map();
+        const commandRegistry = new CommandRegistry();
 
         let consoleOutputData = "";
 
@@ -48,10 +47,10 @@ describe("guppy.console.commands.HelpCommand", () => {
             }
         });
 
-        const helpCommand = new HelpCommand(version, availableCommands);
+        const helpCommand = new HelpCommand(version, commandRegistry);
 
-        availableCommands.set('help', mock<ServiceDefinition>());
-        availableCommands.set('greeting', mock<ServiceDefinition>());
+        commandRegistry.register('help', Object);
+        commandRegistry.register('greeting', Object);
 
         return helpCommand
             .execute(

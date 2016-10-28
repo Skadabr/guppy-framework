@@ -23,20 +23,6 @@ export class PresenterBundle extends Bundle {
 
     services(container: Container, config: ConfigState): void {
         container
-            .factory(
-                Presenter,
-                async () => {
-                    const rootPresenter = new RootPresenter();
-
-                    for (const serviceDefinition of container.byTag(PRESENTER_TAG)) {
-                        rootPresenter.register(
-                            serviceDefinition.tags()[PRESENTER_TAG],
-                            <Presenter> await serviceDefinition.instance()
-                        );
-                    }
-
-                    return rootPresenter;
-                }
-            );
+            .factory(Presenter, async () => new RootPresenter());
     }
 }

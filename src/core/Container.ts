@@ -1,5 +1,5 @@
 import { ServiceNotRegistered } from "./ServiceNotRegistered";
-import { ServiceDecorator, ServiceFactory, ServiceDefinition, TagSet } from "./ServiceDefinition";
+import { ServiceDecorator, ServiceFactory, ServiceDefinition } from "./ServiceDefinition";
 
 export interface ClassConstructor<T> extends Function {
     new (...args: any[]): T;
@@ -15,23 +15,13 @@ export class Container {
         this.instance(Container, this);
     }
 
-    public factory(service: Function, serviceFactory: ServiceFactory, tags?: TagSet) {
-
-        this._services.set(
-            service,
-            new ServiceDefinition(serviceFactory, tags || {})
-        );
-
+    public factory(service: Function, serviceFactory: ServiceFactory) {
+        this._services.set(service, new ServiceDefinition(serviceFactory));
         return this;
     }
 
-    public instance(service: Function, instance: Object, tags?: TagSet) {
-
-        this._services.set(
-            service,
-            new ServiceDefinition(async () => instance, tags || {})
-        );
-
+    public instance(service: Function, instance: Object) {
+        this._services.set(service, new ServiceDefinition(() => instance));
         return this;
     }
 
@@ -53,18 +43,7 @@ export class Container {
         const serviceDefinition = this._services.get(c);
 
         serviceDefinition.registerDecorator(decorator);
-    }
 
-    public byTag(tagName: string): Array<ServiceDefinition> {
-
-        let services: ServiceDefinition[] = [];
-
-        for (const serviceDefinition of this._services.values()) {
-            if (serviceDefinition.tags().hasOwnProperty(tagName)) {
-                services.push(serviceDefinition);
-            }
-        }
-
-        return services;
+        return this;
     }
 }
