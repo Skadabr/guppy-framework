@@ -1,17 +1,14 @@
 import { Bundle } from "../../core/Bundle";
 import { Container } from "../../core/Container";
 import { Config, ConfigState } from "../../core/Config";
-import { DefaultHandlerResolver } from "./DefaultHandlerResolver";
-import { HandlerResolver } from "./HandlerResolver";
-import { RouteLoader } from "./RouteLoader";
-import { ActionInvoker } from "./ActionInvoker";
 import { HttpServer } from "./HttpServer";
 import { HttpServerCommand } from "./commands/HttpServerCommand";
 import { HttpRoutesCommand } from "./commands/HttpRoutesCommand";
 import { Presenter } from "../../presenter/Presenter";
-import { ReducerRegistry, RequestReducer } from "./ReducerRegistry";
-import { ConsoleOutput } from "../../console";
-import {CommandRegistry} from "../../console/CommandRegistry";
+import { CommandRegistry } from "../../console/CommandRegistry";
+import { RouteRegistry } from "./RouteRegistry";
+import { Router, DefaultRouter } from ".";
+import {MiddlewareRegistry} from "./MiddlewareRegistry";
 
 export class HttpBundle implements Bundle {
 
@@ -32,26 +29,22 @@ export class HttpBundle implements Bundle {
 
     services(container: Container, config: ConfigState) {
         container
-            .instance(HandlerResolver, new DefaultHandlerResolver())
-            .factory(RouteLoader, async () => new RouteLoader(
+            .factory(RouteRegistry, async () => new RouteRegistry(
                 await container.get(Container),
-                await container.get(HandlerResolver)
+                await container.get(MiddlewareRegistry)
             ))
-            .factory(ActionInvoker, async () => new ActionInvoker(
-                await container.get(ConsoleOutput)
+            .factory(Router, async () => new DefaultRouter(
+                await container.get(RouteRegistry)
             ))
-            .factory(ReducerRegistry, () => new ReducerRegistry())
+            .factory(MiddlewareRegistry, () => new MiddlewareRegistry())
             .factory(HttpServer, async () => new HttpServer(
-                await container.get(HandlerResolver),
-                await container.get(ActionInvoker),
-                await container.get(Presenter),
-                await container.get(ReducerRegistry)
+                await container.get(Router),
+                await container.get(Presenter)
             ))
             .factory(
                 HttpServerCommand,
                 async () => new HttpServerCommand(
                     await container.get(HttpServer),
-                    await container.get(RouteLoader),
                     config.has("guppy.http.serverPort")
                         ? parseInt(<string> config.get("guppy.http.serverPort"))
                         : null
@@ -60,7 +53,7 @@ export class HttpBundle implements Bundle {
             .factory(
                 HttpRoutesCommand,
                 async () => new HttpRoutesCommand(
-                    await container.get(Container)
+                    await container.get(RouteRegistry)
                 )
             )
             .extend(

@@ -2,12 +2,11 @@ import assert = require("assert");
 
 import * as fetch from "node-fetch";
 
-import { ConsoleOutput } from "../../../console";
-import { Response } from "../../../http";
-import { HttpServer, HandlerResolver, ReducerRegistry, ActionInvoker, RequestReducer, Reducer } from "../../../http/server";
-import { DefaultHandlerResolver } from "./DefaultHandlerResolver";
+import { HttpServer } from "../../../http/server";
+import { StubRouter } from "./StubRouter";
 import { Presenter, RootPresenter } from "../../../presenter";
-import { ValidationError } from "../../../validation";
+import { Router } from "../../../http/server/Router";
+
 import net = require("net");
 
 let httpServer: HttpServer;
@@ -19,27 +18,9 @@ function mock<T>(data?: Object): T {
 describe("guppy.http.server.HttpServer", () => {
 
     before(() => {
-        const reducerRegistry = new ReducerRegistry();
-
-        reducerRegistry.registerRequestReducer(
-            mock<RequestReducer>({
-                modify: (value) => Promise.resolve(value)
-            })
-        );
-
-        reducerRegistry.registerResponseReducer(
-            mock<Reducer<Response>>({
-                modify: (value) => Promise.resolve(value)
-            })
-        );
-
         httpServer = new HttpServer(
-            new DefaultHandlerResolver(),
-            new ActionInvoker(
-                mock<ConsoleOutput>()
-            ),
-            new RootPresenter(),
-            reducerRegistry
+            new StubRouter(),
+            new RootPresenter()
         );
     });
 
@@ -94,85 +75,39 @@ describe("guppy.http.server.HttpServer", () => {
     it("cannot start a http-server on a used port", (done) => {
 
         const secondServer = new HttpServer(
-            new DefaultHandlerResolver(),
-            new ActionInvoker(
-                mock<ConsoleOutput>()
-            ),
-            new RootPresenter(),
-            new ReducerRegistry()
+            new StubRouter(),
+            new RootPresenter()
         );
 
         httpServer
             .listen(8912) // Start first server
             .then(() => secondServer.listen(8912)) // Try to start second server...
             .catch(error => error.message) // ... but we get an error
-            .then((message: string) => {
+            .then(message => {
                 assert.equal(message, "listen EADDRINUSE :::8912");
                 httpServer.terminate(); // Stop first server
                 done();
             });
     });
 
-    it("ignores a terminating of a not started http-server", async () => {
-        
-        await new HttpServer(
-            new DefaultHandlerResolver(),
-            new ActionInvoker(
-                mock<ConsoleOutput>()
-            ),
-            new RootPresenter(),
-            new ReducerRegistry()
-        ).terminate();
-    });
+    it("ignores a terminating of a not started http-server", () => {
 
-    it("handles validation errors", () => {
-        
-        const httpServer = new HttpServer(
-            mock<HandlerResolver>({
-                resolve() {
-                    throw new ValidationError([
-                        new Error(`Field "name" cannot be empty.`)
-                    ]);
-                }
-            }),
-            new ActionInvoker(
-                mock<ConsoleOutput>()
-            ),
-            new RootPresenter(),
-            new ReducerRegistry()
-        );
-
-        return httpServer.listen(8913)
-            .then(() => fetch('http://127.0.0.1:8913'))
-            .then(response => {
-                assert.equal(response.status, 500);
-                return response.json();
-            })
-            .then(response => {
-                assert.deepEqual(response, {
-                    "children": [
-                        "Field \"name\" cannot be empty."
-                    ],
-                    "error": "ValidationError",
-                    "errorMessage": "Validation failed."
-                });
-            })
-            .then(() => httpServer.terminate());
+        return new HttpServer(new StubRouter(), new RootPresenter())
+            .terminate();
     });
 
     it("returns default response when request cannot be handled", () => {
         
         const httpServer = new HttpServer(
-            mock<HandlerResolver>(),
-            new ActionInvoker(
-                mock<ConsoleOutput>()
-            ),
-            mock<Presenter>({
-                present() {
+            mock<Router>({
+                build: () => Promise.resolve(),
+                resolve() {
                     throw new Error("Cannot be presented");
                 }
+
             }),
-            new ReducerRegistry()
+            mock<Presenter>({
+            })
         );
 
         return httpServer.listen(8914)
@@ -192,19 +127,14 @@ describe("guppy.http.server.HttpServer", () => {
     it("returns default response for invalid requests", () => {
         
         const httpServer = new HttpServer(
-            mock<HandlerResolver>(),
-            new ActionInvoker(
-                mock<ConsoleOutput>()
-            ),
-            mock<Presenter>({
-                present() {
-                    throw new Error("Cannot be presented");
-                }
+            mock<Router>({
+                build: () => Promise.resolve()
             }),
-            new ReducerRegistry()
+            mock<Presenter>()
         );
 
-        return httpServer.listen(8915)
+        return httpServer
+            .listen(8915)
             .then(() => new Promise((resolve, reject) => {
                 const client = net.connect(8915, "127.0.0.1");
 

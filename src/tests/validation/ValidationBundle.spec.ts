@@ -1,8 +1,8 @@
 import assert = require("assert");
 
 import { ConfigState, DefaultConfig, Container } from "../../core";
-import { ValidationBundle, ValidationRequestReducer } from "../../validation";
-import { ReducerRegistry } from "../../http/server/ReducerRegistry";
+import { ValidationBundle, ValidationMiddleware } from "../../validation";
+import { MiddlewareRegistry } from "../../http/server";
 
 describe("guppy.validation.ValidationBundle", () => {
 
@@ -32,23 +32,24 @@ describe("guppy.validation.ValidationBundle", () => {
     });
 
     it("registers a ConsoleWriter", () => {
+
         const configState = new ConfigState();
         const container = new Container();
-        const reducerRegistry = new ReducerRegistry();
+        const middlewareRegistry = new MiddlewareRegistry();
 
-        container.instance(ReducerRegistry, reducerRegistry);
+        container.instance(MiddlewareRegistry, middlewareRegistry);
 
         validationBundle.services(container, configState);
 
         return container
-            .get(ValidationRequestReducer)
-            .then((validationRequestReducer: ValidationRequestReducer) => {
-                assert.ok(validationRequestReducer instanceof ValidationRequestReducer);
+            .get(ValidationMiddleware)
+            .then((validationMiddleware: ValidationMiddleware) => {
+                assert.ok(validationMiddleware instanceof ValidationMiddleware);
 
-                return container.get(ReducerRegistry);
+                return container.get(MiddlewareRegistry);
             })
-            .then((reducerRegistry: ReducerRegistry) => {
-                assert.ok(reducerRegistry instanceof ReducerRegistry);
+            .then((middlewareRegistry: MiddlewareRegistry) => {
+                assert.ok(middlewareRegistry instanceof MiddlewareRegistry);
             });
     });
 

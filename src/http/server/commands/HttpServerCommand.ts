@@ -2,8 +2,7 @@ import { Command }          from "../../../console/Command";
 import { ConsoleInput }     from "../../../console/ConsoleInput";
 import { ConsoleOutput }    from "../../../console/ConsoleOutput";
 
-import { HttpServer }   from "./../HttpServer";
-import { RouteLoader }  from "./../RouteLoader";
+import { HttpServer } from "..";
 
 export const DEFAULT_HTTP_PORT = 8082;
 
@@ -11,7 +10,6 @@ export class HttpServerCommand implements Command {
 
     public constructor(
         private _httpServer: HttpServer,
-        private _routeLoader: RouteLoader,
         private _serverPort?: number
     ) {
     }
@@ -23,8 +21,6 @@ export class HttpServerCommand implements Command {
     public execute(input: ConsoleInput, output: ConsoleOutput) {
 
         let serverPort: number = input.optionAsInt('port') || this._serverPort || DEFAULT_HTTP_PORT;
-
-        this._routeLoader.load();
 
         return this._httpServer
             .listen(serverPort)

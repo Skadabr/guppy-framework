@@ -4,5 +4,6 @@ export enum ResponseStatus {
     Accepted = 202,
     NoContent = 204,
     NotFound = 404,
+    NotAcceptable = 406,
     InternalServerError = 500
 }

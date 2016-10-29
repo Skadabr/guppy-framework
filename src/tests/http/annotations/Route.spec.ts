@@ -1,12 +1,12 @@
 import assert = require('assert');
 
-import { MetadataRegistry } from "../../../core";
 import { Route } from "../../../http";
+import { RouteRegistry } from "../../../http/server/RouteRegistry";
 
 describe('guppy.http.annotations.Route', () => {
 
     before(() => {
-        MetadataRegistry.clear();
+        RouteRegistry.prebootClear();
     });
 
     it("does not support using with members", () => {
@@ -20,19 +20,6 @@ describe('guppy.http.annotations.Route', () => {
         );
     });
 
-
-    it("does not registers metadata for classes", () => {
-        
-        class UserController {}
-        
-        assert.equal(
-            false,
-            MetadataRegistry
-                .classesByMetadataKey("guppy.http.route")
-                .has(UserController)
-        );
-    });
-
     it("registers metadata for members", () => {
 
         class UserController {
@@ -40,14 +27,11 @@ describe('guppy.http.annotations.Route', () => {
             public details(userId: number) { }
         }
 
-        let memberMetadata = <Array<Object>> MetadataRegistry
-                .membersByMetadataKey("guppy.http.route")
-                .values()
-                .next()
-                .value;
+        let rawRoute = RouteRegistry.prebootAll()[0];
 
-        assert.equal(memberMetadata.length, 1);
-        assert.equal(memberMetadata[0]["method"], "GET");
-        assert.equal(memberMetadata[0]["route"], "/users/{userId}");
+        assert.equal(rawRoute.route, "/users/{userId}");
+        assert.equal(rawRoute.method, "GET");
+        assert.equal(rawRoute.controllerClass, UserController);
+        assert.equal(rawRoute.handlerName, "details");
     });
 });

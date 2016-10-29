@@ -1,5 +1,5 @@
 import { ConsoleInput, ConsoleOutput } from "../../../../console";
-import { HttpServer, RouteLoader } from "../../../../http/server";
+import { HttpServer } from "../../../../http/server";
 import { HttpServerCommand } from "../../../../http/server/commands/HttpServerCommand";
 
 import assert = require("assert");
@@ -51,98 +51,71 @@ describe("guppy.http.server.commands.HttpServerCommand", () => {
     it("does not accept any arguments", () => {
 
         const httpServer = mock<HttpServer>({ });
-        const routeLoader = mock<RouteLoader>({ });
 
-        const httpServerCommand = new HttpServerCommand(httpServer, routeLoader);
+        const httpServerCommand = new HttpServerCommand(httpServer);
 
         assert.deepEqual(httpServerCommand.inputArguments(), []);
     });
 
     it("runs a server on default port", () => {
 
-        let routesLoaded: boolean = false;
         let listeningPort: number = -1;
-        let infoOutput: string[] = [];
 
         const httpServer = mock<HttpServer>({ 
             listen(port: number) {
                 listeningPort = port;
                 return Promise.resolve();
             }
-        });
-
-        const routeLoader = mock<RouteLoader>({ 
-            load() {
-                routesLoaded = true;
-            } 
         });
 
         const output = new StubConsoleOutput();
         
         const input = new ConsoleInput(new Map(), new Map());
 
-        const httpServerCommand = new HttpServerCommand(httpServer, routeLoader);
+        const httpServerCommand = new HttpServerCommand(httpServer);
 
         return httpServerCommand
             .execute(input, output)
             .then(() => {
-                assert.equal(routesLoaded, true);
-                assert.equal(listeningPort, 8082)
+                assert.equal(listeningPort, 8082);
                 assert.deepEqual(output.infoOutput, ["Server has been started on 8082 port."]);
             });
     });
 
     it("runs a server on passed port", () => {
 
-        let routesLoaded: boolean = false;
         let listeningPort: number = -1;
-        let infoOutput: string[] = [];
 
         const httpServer = mock<HttpServer>({ 
             listen(port: number) {
                 listeningPort = port;
                 return Promise.resolve();
             }
-        });
-
-        const routeLoader = mock<RouteLoader>({ 
-            load() {
-                routesLoaded = true;
-            } 
         });
 
         const output = new StubConsoleOutput();
 
         const input = new ConsoleInput(new Map(), new Map());
 
-        const httpServerCommand = new HttpServerCommand(httpServer, routeLoader, 5000);
+        const httpServerCommand = new HttpServerCommand(httpServer, 5000);
 
         return httpServerCommand
             .execute(input, output)
             .then(() => {
-                assert.equal(routesLoaded, true);
-                assert.equal(listeningPort, 5000)
+                assert.equal(listeningPort, 5000);
                 assert.deepEqual(output.infoOutput, ["Server has been started on 5000 port."]);
             });
     });
 
     it("runs a server on custom port (CLI)", () => {
 
-        let routesLoaded: boolean = false;
         let listeningPort: number = -1;
-        let infoOutput: string[] = [];
 
         const httpServer = mock<HttpServer>({ 
             listen(port: number) {
                 listeningPort = port;
                 return Promise.resolve();
             }
-        });
-
-        const routeLoader = mock<RouteLoader>({ 
-            load() {
-                routesLoaded = true;
-            } 
         });
 
         const output = new StubConsoleOutput();
@@ -153,13 +126,12 @@ describe("guppy.http.server.commands.HttpServerCommand", () => {
 
         const input = new ConsoleInput(inputOption, new Map());
 
-        const httpServerCommand = new HttpServerCommand(httpServer, routeLoader, 5000);
+        const httpServerCommand = new HttpServerCommand(httpServer, 5000);
 
         return httpServerCommand
             .execute(input, output)
             .then(() => {
-                assert.equal(routesLoaded, true);
-                assert.equal(listeningPort, 3032)
+                assert.equal(listeningPort, 3032);
                 assert.deepEqual(output.infoOutput, ["Server has been started on 3032 port."]);
             });
     });

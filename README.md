@@ -33,11 +33,10 @@ export class UserController {
 ## Roadmap
 
 * Error presenters
-* Annotation mechanism improvement
+* Native Queue supporting
+* Logger
 * Multithreaded HTTP server
 * HTTP Client (for microservice communication)
-* Logger
-* Native Queue supporting
 * DBAL supporting
 
 ## Authors

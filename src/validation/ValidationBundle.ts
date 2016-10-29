@@ -1,8 +1,8 @@
 import { Bundle } from "../core/Bundle";
 import { Config, ConfigState } from "../core/Config";
 import { Container } from "../core/Container";
-import { ValidationRequestReducer } from "./ValidationRequestReducer";
-import {ReducerRegistry} from "../http/server/ReducerRegistry";
+import { MiddlewareRegistry } from "../http/server/MiddlewareRegistry";
+import { ValidationMiddleware } from "./ValidationMiddleware";
 
 export class ValidationBundle extends Bundle {
 
@@ -21,13 +21,13 @@ export class ValidationBundle extends Bundle {
     services(container: Container, config: ConfigState): void {
         container
             .factory(
-                ValidationRequestReducer,
-                () => new ValidationRequestReducer()
+                ValidationMiddleware,
+                () => new ValidationMiddleware()
             )
             .extend(
-                ReducerRegistry,
-                async (reducerRegistry: ReducerRegistry) => reducerRegistry.registerRequestReducer(
-                    await container.get(ValidationRequestReducer)
+                MiddlewareRegistry,
+                async (middlewareRegistry: MiddlewareRegistry) => middlewareRegistry.register(
+                    await container.get(ValidationMiddleware)
                 )
             );
     }

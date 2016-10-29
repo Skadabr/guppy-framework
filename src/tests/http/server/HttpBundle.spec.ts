@@ -1,20 +1,19 @@
 import { DefaultConfig, ConfigState, Container } from "../../../core";
 import {
     HttpBundle,
-    HandlerResolver, 
-    RouteLoader,
-    ActionInvoker,
-    ReducerRegistry,
-    HttpServer
+    HttpServer,
+    RouteRegistry
 } from "../../../http/server";
 
 import { ConsoleOutput } from "../../../console"; 
 import { HttpServerCommand } from "../../../http/server/commands/HttpServerCommand";
 import { HttpRoutesCommand } from "../../../http/server/commands/HttpRoutesCommand";
 import { Presenter, RootPresenter } from "../../../presenter";
+import { CommandRegistry } from "../../../console/CommandRegistry";
 
 import assert = require("assert");
-import {CommandRegistry} from "../../../console/CommandRegistry";
+import { Router } from "../../../http/server/Router";
+import { MiddlewareRegistry } from "../../../http/server/MiddlewareRegistry";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -25,6 +24,7 @@ describe("guppy.http.server.HttpBundle", () => {
     let httpBundle: HttpBundle;
 
     before(() => {
+        RouteRegistry.prebootClear();
         httpBundle = new HttpBundle();
     });
 
@@ -60,11 +60,9 @@ describe("guppy.http.server.HttpBundle", () => {
 
         httpBundle.services(container, configState);
 
-        assert.ok(await container.get(HandlerResolver) instanceof HandlerResolver);
-        assert.ok(await container.get(RouteLoader) instanceof RouteLoader);
-        assert.ok(await container.get(ActionInvoker) instanceof ActionInvoker);
-        assert.ok(await container.get(ReducerRegistry) instanceof ReducerRegistry);
-        assert.ok(await container.get(HandlerResolver) instanceof HandlerResolver);
+        assert.ok(await container.get(Router) instanceof Router);
+        assert.ok(await container.get(MiddlewareRegistry) instanceof MiddlewareRegistry);
+        assert.ok(await container.get(RouteRegistry) instanceof RouteRegistry);
         assert.ok(await container.get(HttpServer) instanceof HttpServer);
         assert.ok(await container.get(HttpServerCommand) instanceof HttpServerCommand);
         assert.ok(await container.get(HttpRoutesCommand) instanceof HttpRoutesCommand);

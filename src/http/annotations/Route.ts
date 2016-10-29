@@ -1,8 +1,9 @@
-import { MetadataRegistry } from "../../core/MetadataRegistry";
+import { RouteRegistry } from "../server/RouteRegistry";
 
 export const ROUTE_METADATA_KEY = "guppy.http.route";
 
 export function Route(method: string, route?: string): Function {
+
     return (classSubject, memberName) => {
 
         if (!memberName) {
@@ -13,11 +14,11 @@ export function Route(method: string, route?: string): Function {
             ? classSubject
             : classSubject.constructor;
 
-        MetadataRegistry.putForMember(
-            classDefinition,
-            memberName,
-            ROUTE_METADATA_KEY,
-            { method: method, route: route || "" }
-        );
+        RouteRegistry.prebootRegister({
+            method: method,
+            route: route || "",
+            controllerClass: classDefinition,
+            handlerName: memberName
+        });
     };
 }
