@@ -9,6 +9,7 @@ import { CommandRegistry } from "../../console/CommandRegistry";
 import { RouteRegistry } from "./RouteRegistry";
 import { Router, DefaultRouter } from ".";
 import {MiddlewareRegistry} from "./MiddlewareRegistry";
+import {RouteBuilder} from "./RouteBuilder";
 
 export class HttpBundle implements Bundle {
 
@@ -29,12 +30,14 @@ export class HttpBundle implements Bundle {
 
     services(container: Container, config: ConfigState) {
         container
-            .factory(RouteRegistry, async () => new RouteRegistry(
+            .factory(RouteRegistry, async () => new RouteRegistry())
+            .factory(RouteBuilder, async () => new RouteBuilder(
                 await container.get(Container),
+                await container.get(RouteRegistry),
                 await container.get(MiddlewareRegistry)
             ))
             .factory(Router, async () => new DefaultRouter(
-                await container.get(RouteRegistry)
+                await container.get(RouteBuilder)
             ))
             .factory(MiddlewareRegistry, () => new MiddlewareRegistry())
             .factory(HttpServer, async () => new HttpServer(

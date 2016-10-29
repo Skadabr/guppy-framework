@@ -13,6 +13,9 @@ export const DEFAULT_HANDLER = async (request: Request): Promise<Response> => {
     }
 
     if (request.url() == "/") return Response.ok({ route: "homepage" });
+
+    if (request.url() == "/error") throw new Error("Simulated error");
+
     if (request.url() == "/debug") {
         return Response.ok({
             method: request.method(),

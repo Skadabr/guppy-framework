@@ -76,7 +76,6 @@ export class HttpServer {
 
     private presentError(error: Error): Response {
         return Response.json(ResponseStatus.InternalServerError, {
-            error: error.name,
             errorMessage: error.message
         });
     }

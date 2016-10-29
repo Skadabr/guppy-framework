@@ -1,6 +1,6 @@
 import { Response } from "../Response";
-import { RouteRegistry } from "./RouteRegistry";
 import { Router, RouteAction, ResolvedRoute, Route } from "./Router";
+import { RouteBuilder } from "./RouteBuilder";
 
 export const NotFoundHandler = () => Promise.resolve(
     Response.notFound("Resource not found.")
@@ -11,13 +11,13 @@ export class DefaultRouter extends Router {
     private _handlers: Map<RegExp, { [method: string]: Route }> = new Map();
 
     public constructor(
-        private routeRegistry: RouteRegistry
+        private routeBuilder: RouteBuilder
     ) {
         super();
     }
 
     public build(): Promise<void> {
-        return this.routeRegistry
+        return this.routeBuilder
             .build()
             .then(routeHandlers => {
 

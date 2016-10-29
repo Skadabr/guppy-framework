@@ -1,6 +1,5 @@
-import { NotFoundHandler, RouteRegistry } from "../../../http/server";
 import { Response, Request } from "../../../http";
-import { DefaultRouter } from "../../../http/server";
+import { DefaultRouter, RouteBuilder } from "../../../http/server";
 
 import assert = require("assert");
 
@@ -12,30 +11,32 @@ describe("guppy.http.server.DefaultRouter", () => {
 
     it("registers a route", () => {
 
-        const handlerResolver = new DefaultRouter(
-            mock<RouteRegistry>({
-                build: () => Promise.resolve([])
+        const router = new DefaultRouter(
+            mock<RouteBuilder>({
+                build: () => Promise.resolve([
+                    {
+                        method: "GET",
+                        route: "/users",
+                        handler: (request: Request) => Promise.resolve(
+                            Response.ok({})
+                        )
+                    }
+                ])
             })
         );
 
-        handlerResolver.register(
-            "GET",
-            "/users",
-            (request: Request) => Promise.resolve(
-                Response.ok({})
-            )
-        );
+        return router.build();
     });
 
     it("registers a parameterized route", () => {
 
-        const handlerResolver = new DefaultRouter(
-            mock<RouteRegistry>({
+        const router = new DefaultRouter(
+            mock<RouteBuilder>({
                 build: () => Promise.resolve([])
             })
         );
 
-        handlerResolver.register(
+        router.register(
             "GET",
             "/users/{userId}",
             (request: Request) => Promise.resolve(
@@ -46,13 +47,13 @@ describe("guppy.http.server.DefaultRouter", () => {
 
     it("resolves a parameterized route", () => {
 
-        const handlerResolver = new DefaultRouter(
-            mock<RouteRegistry>({
+        const router = new DefaultRouter(
+            mock<RouteBuilder>({
                 build: () => Promise.resolve([])
             })
         );
 
-        handlerResolver.register(
+        router.register(
             "GET",
             "/users/{userId}",
             (request: Request) => Promise.resolve(
@@ -60,7 +61,7 @@ describe("guppy.http.server.DefaultRouter", () => {
             )
         );
 
-        const handler = handlerResolver.resolve("GET", "/users/2");
+        const handler = router.resolve("GET", "/users/2");
 
         assert.deepEqual(handler.routeParameters, { userId: '2' });
 
@@ -75,13 +76,13 @@ describe("guppy.http.server.DefaultRouter", () => {
 
     it("resolves a not registered route", () => {
         
-        const handlerResolver = new DefaultRouter(
-            mock<RouteRegistry>({
+        const router = new DefaultRouter(
+            mock<RouteBuilder>({
                 build: () => Promise.resolve([])
             })
         );
 
-        const handler = handlerResolver.resolve("GET", "/health-check");
+        const handler = router.resolve("GET", "/health-check");
 
         assert.deepEqual(handler.routeParameters, { });
 

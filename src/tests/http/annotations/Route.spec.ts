@@ -27,7 +27,9 @@ describe('guppy.http.annotations.Route', () => {
             public details(userId: number) { }
         }
 
-        let rawRoute = RouteRegistry.prebootAll()[0];
+        const routeRegistry = new RouteRegistry();
+
+        let rawRoute = routeRegistry.all()[0];
 
         assert.equal(rawRoute.route, "/users/{userId}");
         assert.equal(rawRoute.method, "GET");

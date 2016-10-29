@@ -69,6 +69,16 @@ describe("guppy.http.server.HttpServer", () => {
             });
         }
 
+        {
+            response = await fetch("http://127.0.0.1:8911/error");
+            responseContent = await response.json();
+
+            assert.equal(response.status, 500);
+            assert.deepEqual(responseContent, {
+                "errorMessage": "Simulated error"
+            });
+        }
+
         await httpServer.terminate();
     });
 
