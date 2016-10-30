@@ -16,7 +16,7 @@ import { Get, Response } from "guppy/http";
 export class UserController {
 
     @Get("/greeting")
-    public greeting() {
+    public async greeting() {
         return Response.ok({ greeting: "Hello Guppy!" });
     }
 }
