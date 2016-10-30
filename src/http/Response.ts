@@ -44,7 +44,7 @@ export class Response {
     public static notFound(content: any, headers?: Headers) {
         return Response.json(
             ResponseStatus.NotFound,
-            { error: content },
+            content,
             headers
         );
     }

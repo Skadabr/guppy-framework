@@ -5,6 +5,7 @@ import { Presenter } from "../../presenter/Presenter";
 import { Response } from "../Response";
 import { ResponseStatus } from "../ResponseStatus";
 import { Router } from "./Router";
+import {ErrorHandlerRegistry} from "./ErrorHandlerRegistry";
 
 export class HttpServer {
 
@@ -12,7 +13,8 @@ export class HttpServer {
 
     public constructor(
         private _router: Router,
-        private _presenter: Presenter
+        private _presenter: Presenter,
+        private _errorHandlerRegistry: ErrorHandlerRegistry
     ) {
         this._server = http.createServer((nativeRequest, nativeResponse) => {
 
@@ -33,17 +35,14 @@ export class HttpServer {
     }
 
     private handleRequest(httpSession: HttpSession): Promise<void> {
-
-        try {
-            const resolverRoute = this._router.resolve(httpSession.method, httpSession.url);
-
-            return resolverRoute
-                .handler(httpSession.createRequest(resolverRoute.routeParameters))
-                .catch(error => this.presentError(error))
+        return Promise
+                .resolve()
+                .then(() => this._router.resolve(httpSession.method, httpSession.url))
+                .then(resolvedRoute => resolvedRoute.handler(
+                    httpSession.createRequest(resolvedRoute.routeParameters)
+                ))
+                .catch(error => this._errorHandlerRegistry.handle(error))
                 .then((response:Response) => httpSession.sendResponse(response, this._presenter));
-        } catch (error) {
-            return Promise.reject(error);
-        }
     }
 
     public listen(port: number): Promise<void> {
@@ -71,12 +70,6 @@ export class HttpServer {
         return new Promise<void>((resolve, reject) => {
             this._server.once('close', () => resolve());
             this._server.close();
-        });
-    }
-
-    private presentError(error: Error): Response {
-        return Response.json(ResponseStatus.InternalServerError, {
-            errorMessage: error.message
         });
     }
 }

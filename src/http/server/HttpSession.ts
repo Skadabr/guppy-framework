@@ -26,21 +26,20 @@ export class HttpSession {
 
     public sendResponse(response: Response, presenter: Presenter) {
 
-        const content: any = presenter.present(
-            response.content()
-        );
-
-        const serializedContent: string = JSON.stringify(content);
-
         const headers: Headers = response.headers();
+
         for (let headerName in headers) {
             this._nativeResponse.setHeader(headerName, headers[headerName]);
         }
 
         this._nativeResponse.statusCode = response.statusCode();
-        this._nativeResponse.setHeader('Content-Length', `${serializedContent.length}`);
 
-        if (content && response.statusCode() !== ResponseStatus.NoContent && this._nativeRequest.method !== 'HEAD') {
+        if (response.statusCode() !== ResponseStatus.NoContent && this._nativeRequest.method !== 'HEAD') {
+            const serializedContent: string = JSON.stringify(
+                presenter.present(response.content())
+            );
+
+            this._nativeResponse.setHeader('Content-Length', `${serializedContent.length}`);
             this._nativeResponse.write(serializedContent);
         }
 
@@ -66,7 +65,7 @@ export class HttpSession {
 
         const contentType = this._nativeRequest.headers["content-type"];
 
-        if ( ! contentType) return {};
+        if (!contentType || this._nativeRequest.method === "GET" || this._nativeRequest.method === "HEAD") return {};
 
         switch (contentType) {
             case "application/json":

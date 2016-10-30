@@ -1,13 +1,11 @@
 import assert = require("assert");
-
+import net = require("net");
 import * as fetch from "node-fetch";
 
-import { HttpServer } from "../../../http/server";
-import { StubRouter } from "./StubRouter";
+import { HttpServer, ErrorHandlerRegistry, Router } from "../../../http/server";
 import { Presenter, RootPresenter } from "../../../presenter";
-import { Router } from "../../../http/server/Router";
 
-import net = require("net");
+import { StubRouter } from "./StubRouter";
 
 let httpServer: HttpServer;
 
@@ -20,7 +18,8 @@ describe("guppy.http.server.HttpServer", () => {
     before(() => {
         httpServer = new HttpServer(
             new StubRouter(),
-            new RootPresenter()
+            new RootPresenter(),
+            new ErrorHandlerRegistry()
         );
     });
 
@@ -75,7 +74,8 @@ describe("guppy.http.server.HttpServer", () => {
 
             assert.equal(response.status, 500);
             assert.deepEqual(responseContent, {
-                "errorMessage": "Simulated error"
+                "developerMessage": "Simulated error",
+                "userMessage": "Internal Server Error"
             });
         }
 
@@ -86,7 +86,8 @@ describe("guppy.http.server.HttpServer", () => {
 
         const secondServer = new HttpServer(
             new StubRouter(),
-            new RootPresenter()
+            new RootPresenter(),
+            new ErrorHandlerRegistry()
         );
 
         httpServer
@@ -102,8 +103,11 @@ describe("guppy.http.server.HttpServer", () => {
 
     it("ignores a terminating of a not started http-server", () => {
 
-        return new HttpServer(new StubRouter(), new RootPresenter())
-            .terminate();
+        return new HttpServer(
+            new StubRouter(),
+            new RootPresenter(),
+            new ErrorHandlerRegistry()
+        ).terminate();
     });
 
     it("returns default response when request cannot be handled", () => {
@@ -116,8 +120,8 @@ describe("guppy.http.server.HttpServer", () => {
                 }
 
             }),
-            mock<Presenter>({
-            })
+            mock<Presenter>(),
+            new ErrorHandlerRegistry()
         );
 
         return httpServer.listen(8914)
@@ -140,7 +144,8 @@ describe("guppy.http.server.HttpServer", () => {
             mock<Router>({
                 build: () => Promise.resolve()
             }),
-            mock<Presenter>()
+            mock<Presenter>(),
+            new ErrorHandlerRegistry()
         );
 
         return httpServer

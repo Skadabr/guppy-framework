@@ -10,6 +10,7 @@ import { RouteRegistry } from "./RouteRegistry";
 import { Router, DefaultRouter } from ".";
 import {MiddlewareRegistry} from "./MiddlewareRegistry";
 import {RouteBuilder} from "./RouteBuilder";
+import {ErrorHandlerRegistry} from "./ErrorHandlerRegistry";
 
 export class HttpBundle implements Bundle {
 
@@ -31,6 +32,7 @@ export class HttpBundle implements Bundle {
     services(container: Container, config: ConfigState) {
         container
             .factory(RouteRegistry, async () => new RouteRegistry())
+            .factory(ErrorHandlerRegistry, async () => new ErrorHandlerRegistry())
             .factory(RouteBuilder, async () => new RouteBuilder(
                 await container.get(Container),
                 await container.get(RouteRegistry),
@@ -42,7 +44,8 @@ export class HttpBundle implements Bundle {
             .factory(MiddlewareRegistry, () => new MiddlewareRegistry())
             .factory(HttpServer, async () => new HttpServer(
                 await container.get(Router),
-                await container.get(Presenter)
+                await container.get(Presenter),
+                await container.get(ErrorHandlerRegistry)
             ))
             .factory(
                 HttpServerCommand,

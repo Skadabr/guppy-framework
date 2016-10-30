@@ -2,6 +2,8 @@ import assert = require("assert");
 
 import { Request } from "../../../http";
 import { HttpSession } from "../../../http/server";
+import {Response} from "../../../http/Response";
+import {Presenter} from "../../../presenter/Presenter";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -9,10 +11,10 @@ function mock<T>(data?: Object): T {
 
 describe("guppy.http.server.HttpSession", () => {
 
-    it("returns the message about invalid content", (done) => {
+    it("returns the message about invalid content", () => {
 
         const nativeRequest = mock({
-            method: "GET",
+            method: "POST",
             url: "/users",
             headers: {
                 "content-type": "application/json"
@@ -31,18 +33,16 @@ describe("guppy.http.server.HttpSession", () => {
 
         const httpSession = new HttpSession(nativeRequest, nativeResponse, "invalid json");
 
-        try {
-            httpSession.createRequest({});
-        } catch (error) {
-            assert.equal(error.message, "Invalid JSON in request.");
-            done();
-        }
+        assert.throws(
+            () => httpSession.createRequest({}),
+            /Invalid JSON in request./
+        );
     });
 
-    it("returns the message about unsupported content-type", (done) => {
+    it("returns the message about unsupported content-type", () => {
 
         const nativeRequest = mock({
-            method: "GET",
+            method: "POST",
             url: "/users",
             headers: {
                 "content-type": "invalid/mime"
@@ -55,18 +55,15 @@ describe("guppy.http.server.HttpSession", () => {
         const nativeResponse = mock({
             statusCode: -1,
             end(content: string) {
-
             }
         });
 
         const httpSession = new HttpSession(nativeRequest, nativeResponse, "");
 
-        try {
-            httpSession.createRequest({});
-        } catch (error) {
-            assert.equal(error.message, "Unsupported Content-Type. Given: invalid/mime.");
-            done();
-        }
+        assert.throws(
+            () => httpSession.createRequest({}),
+            /Unsupported Content-Type. Given: invalid\/mime./
+        );
     });
 
     it("does not parse body when content-type is omitted", () => {
@@ -93,5 +90,91 @@ describe("guppy.http.server.HttpSession", () => {
 
         assert.ok(request instanceof Request);
         assert.deepEqual(request.body, {});
+    });
+
+    it("does not send body for HEAD and for 204 (No Content)", (done) => {
+
+        const nativeRequest = mock({
+            method: "HEAD",
+            url: "/users",
+            headers: { "content-type": "application/json" },
+            connection: {
+                remoteAddress: "127.0.0.1"
+            }
+        });
+
+        let responseHeaders = {};
+        let responseData = "";
+
+        const nativeResponse = mock({
+            statusCode: -1,
+            setHeader(header, value) {
+                responseHeaders[header] = value;
+            },
+            write() {
+                throw new Error("Test shouldn't run it.");
+            },
+            end() {
+                assert.equal(nativeResponse["statusCode"], 200);
+                assert.deepEqual(responseHeaders, {
+                    "Content-Type": "application/json",
+                    "Count": 2
+                });
+                assert.equal(responseData, "");
+                done();
+            }
+        });
+
+        const httpSession = new HttpSession(nativeRequest, nativeResponse, "");
+        const presenter = mock<Presenter>({});
+        const response = Response.list([
+            { id: 1, name: "Bill" },
+            { id: 2, name: "John" }
+        ]);
+
+        httpSession.sendResponse(response, presenter);
+    });
+
+    it("sends body for usual responsec", (done) => {
+
+        const nativeRequest = mock({
+            method: "GET",
+            url: "/users",
+            headers: { "content-type": "application/json" },
+            connection: {
+                remoteAddress: "127.0.0.1"
+            }
+        });
+
+        let responseHeaders = {};
+        let responseData = "";
+        const nativeResponse = mock({
+            statusCode: -1,
+            setHeader(header, value) {
+                responseHeaders[header] = value;
+            },
+            write(data: string) {
+                responseData += data;
+            },
+            end() {
+                assert.equal(nativeResponse["statusCode"], 200);
+                assert.deepEqual(responseHeaders, {
+                    "Content-Length": "47",
+                    "Content-Type": "application/json",
+                    "Count": 2
+                });
+                assert.equal(responseData, `[{"id":1,"name":"Bill"},{"id":2,"name":"John"}]`);
+                done();
+            }
+        });
+
+        const httpSession = new HttpSession(nativeRequest, nativeResponse, "");
+        const presenter = mock<Presenter>({ present: content => content });
+        const response = Response.list([
+            { id: 1, name: "Bill" },
+            { id: 2, name: "John" }
+        ]);
+
+        httpSession.sendResponse(response, presenter);
     });
 });

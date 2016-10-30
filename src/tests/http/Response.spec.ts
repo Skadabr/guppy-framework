@@ -69,7 +69,7 @@ describe("guppy.http.Response", () => {
     it("creates a not found message", () => {
 
         let response = Response.notFound(
-            "User #12 was not found",
+            { message: "User #12 was not found" },
             { "Request-ID": "g9m8y3454vn8" }
         );
 
@@ -80,7 +80,7 @@ describe("guppy.http.Response", () => {
         });
 
         assert.deepEqual(response.content(), {
-            error: "User #12 was not found"
+            message: "User #12 was not found"
         });
     });
 

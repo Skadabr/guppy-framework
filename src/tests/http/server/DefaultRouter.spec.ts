@@ -91,7 +91,7 @@ describe("guppy.http.server.DefaultRouter", () => {
             .then((response: Response) => {
                 assert.ok(response instanceof Response);
                 assert.equal(response.statusCode(), 404);
-                assert.deepEqual(response.content(), { error: "Resource not found." });
+                assert.deepEqual(response.content(), { message: "Resource not found." });
             });
     });
 });

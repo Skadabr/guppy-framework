@@ -29,10 +29,11 @@ export class UserController {
 * Console Commands
 * Module System (allows you create your own Bundles)
 * Request Validation
+* Error presenters
+* HTTP Middlewares
 
 ## Roadmap
 
-* Error presenters
 * Native Queue supporting
 * Logger
 * Multithreaded HTTP server

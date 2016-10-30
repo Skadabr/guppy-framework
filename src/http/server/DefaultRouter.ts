@@ -3,7 +3,7 @@ import { Router, RouteAction, ResolvedRoute, Route } from "./Router";
 import { RouteBuilder } from "./RouteBuilder";
 
 export const NotFoundHandler = () => Promise.resolve(
-    Response.notFound("Resource not found.")
+    Response.notFound({ message: 'Resource not found.' })
 );
 
 export class DefaultRouter extends Router {
