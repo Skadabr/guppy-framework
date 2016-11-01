@@ -29,6 +29,7 @@ export class UserController {
 * Console Commands
 * Module System (allows you create your own Bundles)
 * Request Validation
+* Request Streaming
 * Error presenters
 * HTTP Middlewares
 

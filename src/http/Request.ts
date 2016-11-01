@@ -1,41 +1,39 @@
 import { Headers } from "./Headers";
+import { IncomingMessage } from "http";
 
 export type ParameterSet = { [key: string]: string };
 
 export class Request {
 
     public constructor(
-        private _method: string,
-        private _url: string,
-        private _headers: Headers,
+        private _incomingMessage: IncomingMessage,
         private _body: any,
         private _route: ParameterSet,
-        private _remoteAddress: string,
         private _query?: ParameterSet
     ) {
         this._query = this._query || {};
     }
 
     public method(): string {
-        return this._method;
+        return this._incomingMessage.method;
     }
 
     public url(): string {
-        return this._url;
+        return this._incomingMessage.url;
     }
 
     public get headers(): Headers {
-        return this._headers;
+        return this._incomingMessage.headers;
     }
 
     public header(name: string): string | null {
-        return this._headers[
+        return this._incomingMessage.headers[
                 name.toLowerCase()
         ] || null;
     }
 
     public hasHeader(name: string): boolean {
-        return this._headers.hasOwnProperty(
+        return this._incomingMessage.headers.hasOwnProperty(
             name.toLowerCase()
         );
     }
@@ -53,6 +51,6 @@ export class Request {
     }
 
     public get remoteAddress(): string {
-        return this._remoteAddress;
+        return this._incomingMessage.connection.remoteAddress;
     }
 }

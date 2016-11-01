@@ -3,6 +3,11 @@ import assert = require("assert");
 import { Form, field, ValidationMiddleware } from "../../validation";
 import { Request } from "../../http";
 import { Response } from "../../http/Response";
+import {IncomingMessage} from "http";
+
+function mock<T>(data?: Object): T {
+    return <T> (data || {});
+}
 
 describe("guppy.validation.ValidationMiddleware", () => {
 
@@ -27,12 +32,17 @@ describe("guppy.validation.ValidationMiddleware", () => {
         return validationMiddleware
             .handle(
                 new Request(
-                    "POST", 
-                    "/users",
+                    mock<IncomingMessage>({
+                        method: "POST",
+                        url: "/users",
+                        headers: {
+                        },
+                        connection: {
+                            remoteAddress: "127.0.0.1"
+                        }
+                    }),
+                    { email: "hello!" },
                     {},
-                    { email: "hello!" }, 
-                    {},
-                    "127.0.0.1", 
                     {}
                 ),
                 UserController.prototype.store
@@ -69,12 +79,17 @@ describe("guppy.validation.ValidationMiddleware", () => {
         return validationMiddleware
             .handle(
                 new Request(
-                    "POST", 
-                    "/users",
-                    {},
+                    mock<IncomingMessage>({
+                        method: "POST",
+                        url: "/users",
+                        headers: {
+                        },
+                        connection: {
+                            remoteAddress: "127.0.0.1"
+                        }
+                    }),
                     { name: "Alex", email: "alex@company.com" }, 
                     {},
-                    "127.0.0.1", 
                     {}
                 ),
                 UserController.prototype.store

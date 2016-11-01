@@ -3,6 +3,11 @@ import assert = require("assert");
 import { Container } from "../../../core";
 import { Path, Get, Request, Response } from "../../../http";
 import { RouteBuilder, RouteHandler, RouteRegistry, MiddlewareRegistry } from "../../../http/server";
+import {IncomingMessage} from "http";
+
+function mock<T>(data?: Object): T {
+    return <T> (data || {});
+}
 
 describe("guppy.http.server.RouteBuilder", () => {
 
@@ -90,11 +95,16 @@ describe("guppy.http.server.RouteBuilder", () => {
 
                 return routeHandlers[0].handler(
                     new Request(
-                        "GET", "/users/1/Alex",
-                        {},
+                        mock<IncomingMessage>({
+                            method: "GET",
+                            url: "/users/1/Alex",
+                            headers: { },
+                            connection: {
+                                remoteAddress: "127.0.0.1"
+                            }
+                        }),
                         {},
                         { userId: "1", userSlug: "Alex" },
-                        "127.0.0.1",
                         {}
                     )
 

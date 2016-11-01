@@ -1,18 +1,29 @@
 import { Request } from "../../http";
 
 import assert = require("assert");
+import { IncomingMessage } from "http";
+
+function mock<T>(data?: Object): T {
+    return <T> (data || {});
+}
 
 describe("guppy.http.Request", () => {
 
     it("can be instantiated", () => {
 
         let request: Request = new Request(
-            "PATCH",
-            "/users/8",
-            { "content-type": "application/json" },
+            mock<IncomingMessage>({
+                method: "PATCH",
+                url: "/users/8",
+                headers: {
+                    "content-type": "application/json"
+                },
+                connection: {
+                    remoteAddress: "127.0.0.1"
+                }
+            }),
             { name: "Alex" },
-            { userId: "8" },
-            "127.0.0.1"        
+            { userId: "8" }
         );
 
         assert.equal(request.method(), "PATCH");
@@ -30,12 +41,18 @@ describe("guppy.http.Request", () => {
     it("can be instantiated with query", () => {
 
         let request: Request = new Request(
-            "GET",
-            "/users",
-            { "content-type": "application/json" },
+            mock<IncomingMessage>({
+                method: "GET",
+                url: "/users",
+                headers: {
+                    "content-type": "application/json"
+                },
+                connection: {
+                    remoteAddress: "172.17.0.1"
+                }
+            }),
             { },
             { },
-            "172.17.0.1",
             { page: "3" }
         );
 

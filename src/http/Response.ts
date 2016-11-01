@@ -1,13 +1,22 @@
 import { ResponseStatus } from "./ResponseStatus";
 import { Headers } from "./Headers";
 
+export type ResponseStreamWriter = (stream: ResponseStream) => void;
+
+export interface ResponseStream {
+    write(content: string | Buffer);
+    end(content?: string | Buffer);
+}
+
 export class Response {
 
     public constructor(
         private _content: any,
         private _statusCode: number,
-        private _headers: Headers
+        private _headers: Headers,
+        public streamWriter?: ResponseStreamWriter
     ) {
+        if (this._statusCode === void 0) this._statusCode = ResponseStatus.Ok;
 
     }
 
@@ -23,7 +32,7 @@ export class Response {
         return this._statusCode;
     }
 
-    public static json(statusCode: number, content: any, headers?: Headers) {
+    public static json(statusCode: number, content: any, headers?: Headers): Response {
         headers = headers || {};
 
         return new Response(
@@ -33,7 +42,7 @@ export class Response {
         );
     }
 
-    public static ok(content: any, headers?: Headers) {
+    public static ok(content: any, headers?: Headers): Response {
         return Response.json(
             ResponseStatus.Ok,
             content,
@@ -41,7 +50,7 @@ export class Response {
         );
     }
 
-    public static notFound(content: any, headers?: Headers) {
+    public static notFound(content: any, headers?: Headers): Response {
         return Response.json(
             ResponseStatus.NotFound,
             content,
@@ -49,11 +58,15 @@ export class Response {
         );
     }
 
-    public static list(content: any, headers?: Headers) {
+    public static list(content: any, headers?: Headers): Response {
         return Response.json(
             ResponseStatus.Ok,
             content,
             Object.assign({ "Count": content.length }, headers)
         );
+    }
+
+    public static stream(streamWriter: ResponseStreamWriter, headers?: Headers, statusCode?: number): Response {
+        return new Response(null, statusCode, headers, streamWriter);
     }
 }

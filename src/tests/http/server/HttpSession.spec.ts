@@ -4,6 +4,8 @@ import { Request } from "../../../http";
 import { HttpSession } from "../../../http/server";
 import {Response} from "../../../http/Response";
 import {Presenter} from "../../../presenter/Presenter";
+import {IncomingMessage} from "http";
+import {ServerResponse} from "http";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -31,7 +33,11 @@ describe("guppy.http.server.HttpSession", () => {
             }
         });
 
-        const httpSession = new HttpSession(nativeRequest, nativeResponse, "invalid json");
+        const httpSession = new HttpSession(
+            mock<IncomingMessage>(nativeRequest),
+            mock<ServerResponse>(nativeResponse),
+            "invalid json"
+        );
 
         assert.throws(
             () => httpSession.createRequest({}),
@@ -58,7 +64,11 @@ describe("guppy.http.server.HttpSession", () => {
             }
         });
 
-        const httpSession = new HttpSession(nativeRequest, nativeResponse, "");
+        const httpSession = new HttpSession(
+            mock<IncomingMessage>(nativeRequest),
+            mock<ServerResponse>(nativeResponse),
+            ""
+        );
 
         assert.throws(
             () => httpSession.createRequest({}),
@@ -84,7 +94,11 @@ describe("guppy.http.server.HttpSession", () => {
             }
         });
 
-        const httpSession = new HttpSession(nativeRequest, nativeResponse, "some body data");
+        const httpSession = new HttpSession(
+            mock<IncomingMessage>(nativeRequest),
+            mock<ServerResponse>(nativeResponse),
+            "some body data"
+        );
 
         const request = httpSession.createRequest({});
 
@@ -125,7 +139,11 @@ describe("guppy.http.server.HttpSession", () => {
             }
         });
 
-        const httpSession = new HttpSession(nativeRequest, nativeResponse, "");
+        const httpSession = new HttpSession(
+            mock<IncomingMessage>(nativeRequest),
+            mock<ServerResponse>(nativeResponse),
+            ""
+        );
         const presenter = mock<Presenter>({});
         const response = Response.list([
             { id: 1, name: "Bill" },
@@ -135,7 +153,7 @@ describe("guppy.http.server.HttpSession", () => {
         httpSession.sendResponse(response, presenter);
     });
 
-    it("sends body for usual responsec", (done) => {
+    it("sends body for usual response", (done) => {
 
         const nativeRequest = mock({
             method: "GET",
@@ -168,12 +186,61 @@ describe("guppy.http.server.HttpSession", () => {
             }
         });
 
-        const httpSession = new HttpSession(nativeRequest, nativeResponse, "");
+        const httpSession = new HttpSession(
+            mock<IncomingMessage>(nativeRequest),
+            mock<ServerResponse>(nativeResponse),
+            ""
+        );
         const presenter = mock<Presenter>({ present: content => content });
         const response = Response.list([
             { id: 1, name: "Bill" },
             { id: 2, name: "John" }
         ]);
+
+        httpSession.sendResponse(response, presenter);
+    });
+
+    it("streams data for streaming response", (done) => {
+
+        const nativeRequest = mock({
+            method: "GET",
+            url: "/users.csv",
+            connection: {
+                remoteAddress: "127.0.0.1"
+            }
+        });
+
+        let responseHeaders = {};
+        let responseData = "";
+        const nativeResponse = mock({
+            statusCode: -1,
+            setHeader(header, value) {
+                responseHeaders[header] = value;
+            },
+            write(data: string) {
+                responseData += data;
+            },
+            end() {
+                assert.equal(nativeResponse["statusCode"], 200);
+                assert.deepEqual(responseHeaders, {
+                    "Content-Type": "text/csv"
+                });
+                assert.equal(responseData, `1, Bill\n2, John\n`);
+                done();
+            }
+        });
+
+        const httpSession = new HttpSession(
+            mock<IncomingMessage>(nativeRequest),
+            mock<ServerResponse>(nativeResponse),
+            ""
+        );
+        const presenter = mock<Presenter>({ present: content => content });
+        const response = Response.stream(stream => {
+            stream.write("1, Bill\n");
+            stream.write("2, John\n");
+            stream.end();
+        }, { "Content-Type": "text/csv" });
 
         httpSession.sendResponse(response, presenter);
     });

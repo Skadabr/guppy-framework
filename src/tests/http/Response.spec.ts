@@ -1,6 +1,10 @@
-import { Response } from "../../http";
-
 import assert = require("assert");
+
+import { Response, ResponseStream } from "../../http";
+
+function mock<T>(data?: Object): T {
+    return <T> (data || {});
+}
 
 describe("guppy.http.Response", () => {
 
@@ -62,7 +66,7 @@ describe("guppy.http.Response", () => {
 
         assert.deepEqual(response.content(), [
             { userId: 3 },
-            { userId: 4 } 
+            { userId: 4 }
         ]);
     });
 
@@ -82,6 +86,43 @@ describe("guppy.http.Response", () => {
         assert.deepEqual(response.content(), {
             message: "User #12 was not found"
         });
+    });
+
+    it("streams data", () => {
+
+        let response = Response.stream(
+            (stream: ResponseStream) => {
+                stream.write(`ID, Name\n`);
+                stream.write(`1, John\n`);
+                stream.write(`2, Bill\n`);
+                stream.end();
+            },
+            {
+                "Content-Type": "text/csv"
+            }
+        );
+
+        assert.equal(response.statusCode(), 200);
+        assert.deepEqual(response.headers(), { "Content-Type": "text/csv" });
+
+        assert.equal(response.content(), null);
+        assert.ok(response.streamWriter instanceof Function);
+
+        let content = "";
+
+        response.streamWriter(
+            mock<ResponseStream>({
+                write(chunk) {
+                    content += chunk
+                },
+
+                end(chunk) {
+                    if (chunk !== void 0) content += chunk;
+                }
+            })
+        );
+
+        assert.deepEqual(content, `ID, Name\n1, John\n2, Bill\n`);
     });
 
 });

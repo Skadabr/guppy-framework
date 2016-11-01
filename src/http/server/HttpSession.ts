@@ -5,12 +5,14 @@ import { ResponseStatus } from "../ResponseStatus";
 import { Headers } from "../Headers";
 import { Response } from "../Response";
 import { Presenter } from "../../presenter/Presenter";
+import { ServerResponse } from "http";
+import { IncomingMessage } from "http";
 
 export class HttpSession {
 
     public constructor(
-        private _nativeRequest,
-        private _nativeResponse,
+        private _nativeRequest: IncomingMessage,
+        private _nativeResponse: ServerResponse,
         private _nativeRequestBody: string
     ) {
 
@@ -34,16 +36,20 @@ export class HttpSession {
 
         this._nativeResponse.statusCode = response.statusCode();
 
-        if (response.statusCode() !== ResponseStatus.NoContent && this._nativeRequest.method !== 'HEAD') {
-            const serializedContent: string = JSON.stringify(
-                presenter.present(response.content())
-            );
+        if (response.streamWriter !== void 0) {
+            response.streamWriter(this._nativeResponse);
+        } else {
+            if (response.statusCode() !== ResponseStatus.NoContent && this._nativeRequest.method !== 'HEAD') {
+                const serializedContent: string = JSON.stringify(
+                    presenter.present(response.content())
+                );
 
-            this._nativeResponse.setHeader('Content-Length', `${serializedContent.length}`);
-            this._nativeResponse.write(serializedContent);
+                this._nativeResponse.setHeader('Content-Length', `${serializedContent.length}`);
+                this._nativeResponse.write(serializedContent);
+            }
+
+            this._nativeResponse.end();
         }
-
-        this._nativeResponse.end();
     }
 
     public createRequest(routeParameters): Request {
@@ -51,12 +57,9 @@ export class HttpSession {
         const urlParts = url.parse(this._nativeRequest.url, true);
 
         return new Request(
-            this._nativeRequest.method,
-            this._nativeRequest.url,
-            this._nativeRequest.headers,
+            this._nativeRequest,
             this.parseRequestBody(this._nativeRequestBody),
             routeParameters,
-            this._nativeRequest.connection.remoteAddress,
             urlParts.query
         );
     }
