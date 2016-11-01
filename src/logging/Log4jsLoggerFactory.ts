@@ -22,15 +22,12 @@ export class Log4jsLoggerFactory extends LoggerFactory {
         const nativeLogger = log4js.getLogger(loggerName);
         const logger = new Log4jsLogger();
 
-        switch (logLevel) {
-            case LogLevel.Trace: logger.trace = nativeLogger.trace.bind(nativeLogger);
-            case LogLevel.Debug: logger.debug = nativeLogger.debug.bind(nativeLogger);
-            default:
-            case LogLevel.Info: logger.info = nativeLogger.info.bind(nativeLogger);
-            case LogLevel.Warning: logger.trace = nativeLogger.trace.bind(nativeLogger);
-            case LogLevel.Error: logger.error = nativeLogger.error.bind(nativeLogger);
-            case LogLevel.Fatal: logger.fatal = nativeLogger.fatal.bind(nativeLogger);
-        }
+        logger.trace = nativeLogger.trace.bind(nativeLogger);
+        logger.debug = nativeLogger.debug.bind(nativeLogger);
+        logger.info = nativeLogger.info.bind(nativeLogger);
+        logger.warn = nativeLogger.warn.bind(nativeLogger);
+        logger.error = nativeLogger.error.bind(nativeLogger);
+        logger.fatal = nativeLogger.fatal.bind(nativeLogger);
 
         return logger;
     }
