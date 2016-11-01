@@ -1,6 +1,7 @@
 import { Container } from "./Container";
 import { Bundle } from "./Bundle";
 import { BundleLoader } from "./BundleLoader";
+import { Logger, LoggerFactory, Log4jsLoggerFactory } from "../logging";
 import * as glob from "glob";
 
 export class Application {
@@ -14,6 +15,8 @@ export class Application {
 
         const container = new Container();
 
+        container.factory(LoggerFactory, () => new Log4jsLoggerFactory());
+        container.factory(Logger, async () => (await container.get(LoggerFactory)).createLogger());
         container.factory(BundleLoader, async () => new BundleLoader(
             await container.get(Container),
             glob

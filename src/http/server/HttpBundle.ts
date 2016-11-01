@@ -11,6 +11,7 @@ import { Router, DefaultRouter } from ".";
 import {MiddlewareRegistry} from "./MiddlewareRegistry";
 import {RouteBuilder} from "./RouteBuilder";
 import {ErrorHandlerRegistry} from "./ErrorHandlerRegistry";
+import {Logger} from "../../logging/Logger";
 
 export class HttpBundle implements Bundle {
 
@@ -51,6 +52,7 @@ export class HttpBundle implements Bundle {
                 HttpServerCommand,
                 async () => new HttpServerCommand(
                     await container.get(HttpServer),
+                    await container.get(Logger),
                     config.has("guppy.http.serverPort")
                         ? parseInt(<string> config.get("guppy.http.serverPort"))
                         : null

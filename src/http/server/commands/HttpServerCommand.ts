@@ -1,8 +1,8 @@
 import { Command }          from "../../../console/Command";
 import { ConsoleInput }     from "../../../console/ConsoleInput";
 import { ConsoleOutput }    from "../../../console/ConsoleOutput";
-
 import { HttpServer } from "..";
+import { Logger } from "../../../logging/Logger";
 
 export const DEFAULT_HTTP_PORT = 8082;
 
@@ -10,6 +10,7 @@ export class HttpServerCommand implements Command {
 
     public constructor(
         private _httpServer: HttpServer,
+        private _logger: Logger,
         private _serverPort?: number
     ) {
     }
@@ -24,7 +25,9 @@ export class HttpServerCommand implements Command {
 
         return this._httpServer
             .listen(serverPort)
-            .then(() => output.info(`Server has been started on ${serverPort} port.`));
+            .then(() => {
+                this._logger.info(`Server has been started on ${serverPort} port.`)
+            });
     }
 
     public get serverPort(): number {

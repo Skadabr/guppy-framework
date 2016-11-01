@@ -32,11 +32,11 @@ export class UserController {
 * Request Streaming
 * Error presenters
 * HTTP Middlewares
+* Logger
 
 ## Roadmap
 
 * Native Queue supporting
-* Logger
 * Multithreaded HTTP server
 * HTTP Client (for microservice communication)
 * DBAL supporting

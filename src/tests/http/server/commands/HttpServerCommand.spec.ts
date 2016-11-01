@@ -1,8 +1,9 @@
+import assert = require("assert");
+
 import { ConsoleInput, ConsoleOutput } from "../../../../console";
 import { HttpServer } from "../../../../http/server";
 import { HttpServerCommand } from "../../../../http/server/commands/HttpServerCommand";
-
-import assert = require("assert");
+import { Logger } from "../../../../logging/Logger";
 
 function mock<T>(data: Object): T {
     return <T> data;
@@ -10,10 +11,7 @@ function mock<T>(data: Object): T {
 
 class StubConsoleOutput extends ConsoleOutput {
 
-    infoOutput: string[] = [];
-
     public info(message: string): ConsoleOutput {
-        this.infoOutput.push(message);
         return this;
     }
 
@@ -52,7 +50,10 @@ describe("guppy.http.server.commands.HttpServerCommand", () => {
 
         const httpServer = mock<HttpServer>({ });
 
-        const httpServerCommand = new HttpServerCommand(httpServer);
+        const httpServerCommand = new HttpServerCommand(
+            httpServer,
+            mock<Logger>({ info: () => {} })
+        );
 
         assert.deepEqual(httpServerCommand.inputArguments(), []);
     });
@@ -72,13 +73,17 @@ describe("guppy.http.server.commands.HttpServerCommand", () => {
         
         const input = new ConsoleInput(new Map(), new Map());
 
-        const httpServerCommand = new HttpServerCommand(httpServer);
+        const infoOutput: string[] = [];
+        const httpServerCommand = new HttpServerCommand(
+            httpServer,
+            mock<Logger>({ info: (message: string) => infoOutput.push(message) })
+        );
 
         return httpServerCommand
             .execute(input, output)
             .then(() => {
                 assert.equal(listeningPort, 8082);
-                assert.deepEqual(output.infoOutput, ["Server has been started on 8082 port."]);
+                assert.deepEqual(infoOutput, ["Server has been started on 8082 port."]);
             });
     });
 
@@ -97,13 +102,18 @@ describe("guppy.http.server.commands.HttpServerCommand", () => {
 
         const input = new ConsoleInput(new Map(), new Map());
 
-        const httpServerCommand = new HttpServerCommand(httpServer, 5000);
+        const infoOutput: string[] = [];
+        const httpServerCommand = new HttpServerCommand(
+            httpServer,
+            mock<Logger>({ info: (message: string) => infoOutput.push(message) }),
+            5000
+        );
 
         return httpServerCommand
             .execute(input, output)
             .then(() => {
                 assert.equal(listeningPort, 5000);
-                assert.deepEqual(output.infoOutput, ["Server has been started on 5000 port."]);
+                assert.deepEqual(infoOutput, ["Server has been started on 5000 port."]);
             });
     });
 
@@ -126,13 +136,18 @@ describe("guppy.http.server.commands.HttpServerCommand", () => {
 
         const input = new ConsoleInput(inputOption, new Map());
 
-        const httpServerCommand = new HttpServerCommand(httpServer, 5000);
+        const infoOutput: string[] = [];
+        const httpServerCommand = new HttpServerCommand(
+            httpServer,
+            mock<Logger>({ info: (message: string) => infoOutput.push(message) }),
+            5000
+        );
 
         return httpServerCommand
             .execute(input, output)
             .then(() => {
                 assert.equal(listeningPort, 3032);
-                assert.deepEqual(output.infoOutput, ["Server has been started on 3032 port."]);
+                assert.deepEqual(infoOutput, ["Server has been started on 3032 port."]);
             });
     });
 });
