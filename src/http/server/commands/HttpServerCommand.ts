@@ -2,7 +2,7 @@ import { Command }          from "../../../console/Command";
 import { ConsoleInput }     from "../../../console/ConsoleInput";
 import { ConsoleOutput }    from "../../../console/ConsoleOutput";
 import { HttpServer } from "..";
-import { Logger } from "../../../core/Logger";
+import { Logger } from "../../../core/logger";
 
 export const DEFAULT_HTTP_PORT = 8082;
 
