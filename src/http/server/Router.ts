@@ -16,7 +16,7 @@ export interface ResolvedRoute {
 }
 
 export abstract class Router {
-    public abstract build(): Promise<void>;
+    public abstract build(): void;
     public abstract register(method: string, url: string, handler: RouteAction): void;
     public abstract resolve(method: string, url: string): ResolvedRoute;
 }

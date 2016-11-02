@@ -35,22 +35,16 @@ describe("guppy.validation.ValidationBundle", () => {
 
         const configState = new ConfigState();
         const container = new Container();
-        const middlewareRegistry = new MiddlewareRegistry();
 
-        container.instance(MiddlewareRegistry, middlewareRegistry);
+        container.instance(MiddlewareRegistry, new MiddlewareRegistry());
 
         validationBundle.services(container, configState);
 
-        return container
-            .get(ValidationMiddleware)
-            .then((validationMiddleware: ValidationMiddleware) => {
-                assert.ok(validationMiddleware instanceof ValidationMiddleware);
+        const validationMiddleware: ValidationMiddleware = container.get(ValidationMiddleware);
+        const middlewareRegistry: MiddlewareRegistry = container.get(MiddlewareRegistry);
 
-                return container.get(MiddlewareRegistry);
-            })
-            .then((middlewareRegistry: MiddlewareRegistry) => {
-                assert.ok(middlewareRegistry instanceof MiddlewareRegistry);
-            });
+        assert.ok(validationMiddleware instanceof ValidationMiddleware);
+        assert.ok(middlewareRegistry instanceof MiddlewareRegistry);
     });
 
 });

@@ -26,7 +26,7 @@ export class ConsoleBundle implements Bundle {
             )
             .factory(
                 HelpCommand,
-                async () => new HelpCommand(VERSION, await container.get(CommandRegistry))
+                () => new HelpCommand(VERSION, container.get(CommandRegistry))
             )
             .extend(
                 CommandRegistry,
@@ -34,11 +34,11 @@ export class ConsoleBundle implements Bundle {
             )
             .factory(
                 ConsoleWriter,
-                async () => new DefaultConsoleWriter(process.stdout)
+                () => new DefaultConsoleWriter(process.stdout)
             )
             .factory(
                 ConsoleOutput,
-                async () => new DefaultConsoleOutput(await container.get(ConsoleWriter))
+                () => new DefaultConsoleOutput(container.get(ConsoleWriter))
             );
     }
 }

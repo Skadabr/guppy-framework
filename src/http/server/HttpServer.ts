@@ -47,23 +47,23 @@ export class HttpServer {
 
     public listen(port: number): Promise<void> {
 
-        return this._router
-            .build()
-            .then(() => new Promise<void>((resolve, reject) => {
-                const onError = error => {
-                    this._server.removeListener('listening', onListening);
-                    reject(error);
-                };
+        return new Promise<void>((resolve, reject) => {
+            const onError = error => {
+                this._server.removeListener('listening', onListening);
+                reject(error);
+            };
 
-                const onListening = () => {
-                    this._server.removeListener('error', onError);
-                    resolve();
-                };
+            const onListening = () => {
+                this._server.removeListener('error', onError);
+                resolve();
+            };
 
-                this._server.once('error', onError);
-                this._server.once('listening', onListening);
-                this._server.listen(port);
-            }));
+            this._router.build();
+
+            this._server.once('error', onError);
+            this._server.once('listening', onListening);
+            this._server.listen(port);
+        });
     }
 
     public terminate(): Promise<void> {

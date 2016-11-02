@@ -39,24 +39,22 @@ export class RouteBuilder {
     ) {
     }
 
-    public build(): Promise<RouteHandler[]> {
+    public build(): RouteHandler[] {
 
-        let dependencyPromises = new Map<string, Promise<Object>>();
+        let dependencies: Map<Function, Object> = new Map();
         let controllerClass: Function;
         let rawRoutes = this.routeRegistry.all();
 
         for (let routeId in rawRoutes) {
             controllerClass = rawRoutes[routeId].controllerClass;
-            dependencyPromises.set(controllerClass.name, this.container.get(controllerClass));
+            dependencies.set(controllerClass, this.container.get(controllerClass));
 
             const argumentsTypes = this.getArgumentTypes(controllerClass, rawRoutes[routeId].handlerName);
 
             for (let argumentId in argumentsTypes) {
                 if (argumentsTypes[argumentId] === Object) {
-                    return Promise.reject(
-                        new Error(
-                            `All arguments types of ${controllerClass.name}#${rawRoutes[routeId].handlerName} must be declared.`
-                        )
+                    throw new Error(
+                        `All arguments types of ${controllerClass.name}#${rawRoutes[routeId].handlerName} must be declared.`
                     );
                 }
 
@@ -64,64 +62,48 @@ export class RouteBuilder {
                     || argumentsTypes[argumentId] === Number
                     || argumentsTypes[argumentId] === Request) continue;
 
-                dependencyPromises.set(argumentsTypes[argumentId].name, this.container.get(argumentsTypes[argumentId]));
+                dependencies.set(argumentsTypes[argumentId], this.container.get(argumentsTypes[argumentId]));
             }
         }
 
-        let dependencies: Map<Function, Object> = new Map();
+        let routeHandlers: RouteHandler[] = [];
+        let originalHandler;
+        let currentRoute: RawRoute;
+        let routePrefix: string;
+        let middlewares: Middleware[] = this.middlewareRegistry.middlewares().reverse();
+        let finalHandler: RouteAction;
 
-        return Promise
-            .all(dependencyPromises.values())
-            .then((fetchedDependencies: Object[]) => {
-                for (let dependencyId in fetchedDependencies) {
-                    dependencies.set(
-                        fetchedDependencies[dependencyId].constructor,
-                        fetchedDependencies[dependencyId]
-                    );
-                }
-            })
-            .then(() => {
+        for (let routeId in rawRoutes) {
+            currentRoute = rawRoutes[routeId];
+            controllerClass = currentRoute.controllerClass;
+            originalHandler = controllerClass.prototype[currentRoute.handlerName];
+            routePrefix = controllerClass["routePrefix"] || "";
 
-                let routeHandlers: RouteHandler[] = [];
-                let originalHandler;
-                let currentRoute: RawRoute;
-                let routePrefix: string;
-                let middlewares: Middleware[] = this.middlewareRegistry.middlewares().reverse();
-                let finalHandler: RouteAction;
+            finalHandler = Object.assign(
+                this.createHandler(
+                    dependencies.get(currentRoute.controllerClass),
+                    originalHandler,
+                    this.createArgumentFetchers(
+                        this.parseArgumentNames(originalHandler),
+                        this.getArgumentTypes(controllerClass, currentRoute.handlerName),
+                        dependencies
+                    )
+                ),
+                { original: originalHandler }
+            );
 
-                for (let routeId in rawRoutes) {
-                    currentRoute = rawRoutes[routeId];
-                    controllerClass = currentRoute.controllerClass;
-                    originalHandler = controllerClass.prototype[currentRoute.handlerName];
-                    routePrefix = controllerClass["routePrefix"] || "";
+            for (let middlewareId in middlewares) {
+                finalHandler = coverAction(middlewares[middlewareId], finalHandler);
+            }
 
-                    finalHandler = Object.assign(
-                        this.createHandler(
-                            dependencies.get(currentRoute.controllerClass),
-                            originalHandler,
-                            this.createArgumentFetchers(
-                                this.parseArgumentNames(originalHandler),
-                                this.getArgumentTypes(controllerClass, currentRoute.handlerName),
-                                dependencies,
-                                `${controllerClass.name}#${currentRoute.handlerName}` // UserController#details
-                            )
-                        ),
-                        { original: originalHandler }
-                    );
-
-                    for (let middlewareId in middlewares) {
-                        finalHandler = coverAction(middlewares[middlewareId], finalHandler);
-                    }
-
-                    routeHandlers.push({
-                        method: currentRoute.method,
-                        route: routePrefix + currentRoute.route,
-                        handler: finalHandler
-                    });
-                }
-
-                return routeHandlers;
+            routeHandlers.push({
+                method: currentRoute.method,
+                route: routePrefix + currentRoute.route,
+                handler: finalHandler
             });
+        }
+
+        return routeHandlers;
     }
 
     private parseArgumentNames(originalHandler: Function) {
@@ -157,8 +139,7 @@ export class RouteBuilder {
     private createArgumentFetchers(
         argumentNames: string[],
         argumentTypes: Function[],
-        dependencies: Map<Function, Object>,
-        fullHandlerName: string
+        dependencies: Map<Function, Object>
     ): ArgumentFetcher<any>[] {
 
         let argumentFetchers: ArgumentFetcher<any>[] = [];

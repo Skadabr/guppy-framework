@@ -32,27 +32,27 @@ export class HttpBundle implements Bundle {
 
     services(container: Container, config: ConfigState) {
         container
-            .factory(RouteRegistry, async () => new RouteRegistry())
-            .factory(ErrorHandlerRegistry, async () => new ErrorHandlerRegistry())
-            .factory(RouteBuilder, async () => new RouteBuilder(
-                await container.get(Container),
-                await container.get(RouteRegistry),
-                await container.get(MiddlewareRegistry)
+            .factory(RouteRegistry, () => new RouteRegistry())
+            .factory(ErrorHandlerRegistry, () => new ErrorHandlerRegistry())
+            .factory(RouteBuilder, () => new RouteBuilder(
+                container.get(Container),
+                container.get(RouteRegistry),
+                container.get(MiddlewareRegistry)
             ))
-            .factory(Router, async () => new DefaultRouter(
-                await container.get(RouteBuilder)
+            .factory(Router, () => new DefaultRouter(
+                container.get(RouteBuilder)
             ))
             .factory(MiddlewareRegistry, () => new MiddlewareRegistry())
-            .factory(HttpServer, async () => new HttpServer(
-                await container.get(Router),
-                await container.get(Presenter),
-                await container.get(ErrorHandlerRegistry)
+            .factory(HttpServer, () => new HttpServer(
+                container.get(Router),
+                container.get(Presenter),
+                container.get(ErrorHandlerRegistry)
             ))
             .factory(
                 HttpServerCommand,
-                async () => new HttpServerCommand(
-                    await container.get(HttpServer),
-                    (await container.get(LoggerFactory)).createLogger("[http]"),
+                () => new HttpServerCommand(
+                    container.get(HttpServer),
+                    container.get(LoggerFactory).createLogger("[http]"),
                     config.has("guppy.http.serverPort")
                         ? parseInt(<string> config.get("guppy.http.serverPort"))
                         : null
@@ -60,8 +60,8 @@ export class HttpBundle implements Bundle {
             )
             .factory(
                 HttpRoutesCommand,
-                async () => new HttpRoutesCommand(
-                    await container.get(RouteRegistry)
+                () => new HttpRoutesCommand(
+                    container.get(RouteRegistry)
                 )
             )
             .extend(

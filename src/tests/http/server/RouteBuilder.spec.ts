@@ -26,10 +26,10 @@ describe("guppy.http.server.RouteBuilder", () => {
         const middlewareRegistry: MiddlewareRegistry = new MiddlewareRegistry();
         const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry);
 
-        return routeBuilder
-            .build()
-            .catch(error => error)
-            .then((error: any) => assert.equal(error.message, `Service "UserController" is not registered.`));
+        assert.throws(
+            () => routeBuilder.build(),
+            /Service "UserController" is not registered./
+        );
     });
 
 
@@ -49,12 +49,10 @@ describe("guppy.http.server.RouteBuilder", () => {
 
         container.factory(UserController, () => new UserController());
 
-        return routeBuilder
-            .build()
-            .catch(error => error)
-            .then((error: any) => {
-                assert.equal(error.message, `All arguments types of UserController#all must be declared.`);
-            });
+        assert.throws(
+            () => routeBuilder.build(),
+            /All arguments types of UserController#all must be declared./
+        );
     });
 
     it("builds an independent handler", () => {
@@ -86,30 +84,28 @@ describe("guppy.http.server.RouteBuilder", () => {
         container.instance(RouteRegistry, routeRegistry);
         container.factory(UserController, () => new UserController());
 
-        return routeBuilder
-            .build()
-            .then((routeHandlers: RouteHandler[]) => {
-                assert.equal(routeHandlers.length, 1);
-                assert.equal(routeHandlers[0].method, "GET");
-                assert.equal(routeHandlers[0].route, "/users/{userId}/{userSlug}");
+        const routeHandlers: RouteHandler[] = routeBuilder.build();
 
-                return routeHandlers[0].handler(
-                    new Request(
-                        mock<IncomingMessage>({
-                            method: "GET",
-                            url: "/users/1/Alex",
-                            headers: { },
-                            connection: {
-                                remoteAddress: "127.0.0.1"
-                            }
-                        }),
-                        {},
-                        { userId: "1", userSlug: "Alex" },
-                        {}
-                    )
+        assert.equal(routeHandlers.length, 1);
+        assert.equal(routeHandlers[0].method, "GET");
+        assert.equal(routeHandlers[0].route, "/users/{userId}/{userSlug}");
 
-                );
-            })
+        return routeHandlers[0]
+            .handler(
+                new Request(
+                    mock<IncomingMessage>({
+                        method: "GET",
+                        url: "/users/1/Alex",
+                        headers: { },
+                        connection: {
+                            remoteAddress: "127.0.0.1"
+                        }
+                    }),
+                    {},
+                    { userId: "1", userSlug: "Alex" },
+                    {}
+                )
+            )
             .then((response: Response) => {
                 assert.deepEqual(response.content(), {
                     "routesCount": 1,

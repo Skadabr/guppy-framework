@@ -25,7 +25,7 @@ export class Container {
         return this;
     }
 
-    public async get<T>(c: Class<T>): Promise<T> {
+    public get<T>(c: Class<T>): T {
 
         if (!this._services.has(c)) {
             throw new ServiceNotRegistered(c.name);

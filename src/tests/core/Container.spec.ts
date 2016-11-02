@@ -5,17 +5,17 @@ import { Container } from "../../core/Container";
 
 describe("guppy.core.Container", () => {
 
-    it("returns registered instances", async () => {
+    it("returns registered instances", () => {
         const container = new Container();
 
         container.instance(Number, 1);
 
-        const value = await container.get(Number);
+        const value = container.get(Number);
          
         assert.equal(1, value);
     });
 
-    it("returns a lazy-loaded instance", async () => {
+    it("returns a lazy-loaded instance", () => {
         const container = new Container();
 
         let counter = 2;
@@ -23,20 +23,18 @@ describe("guppy.core.Container", () => {
         container.factory(Number, () => counter = 3);
 
         assert.equal(2, counter);
-        assert.equal(3, await container.get(Number));
+        assert.equal(3, container.get(Number));
         assert.equal(3, counter);
     });
 
-    it("throws when service isn't registered", (done) => {
+    it("throws when service isn't registered", () => {
 
         const container = new Container();
 
-        container
-            .get(Number)
-            .catch((service: ServiceNotRegistered) => {
-                assert.equal(service.message, `Service "Number" is not registered.`);
-                done();
-            });
+        assert.throws(
+            () => container.get(Number),
+            /Service "Number" is not registered./
+        );
     });
 
     it("extends an existent service", () => {
@@ -72,11 +70,10 @@ describe("guppy.core.Container", () => {
                 (firstService: FirstService) => firstService.add(3)
             );
 
-        return container.get(FirstService)
-            .then((firstService: FirstService) => {
-                assert.ok(firstService instanceof FirstService);
-                assert.equal(firstService.sum(), 2 + 3);
-            });
+        const firstService = container.get(FirstService);
+
+        assert.ok(firstService instanceof FirstService);
+        assert.equal(firstService.sum(), 2 + 3);
     });
 
     it("throws on extending of non existent service", () => {

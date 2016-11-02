@@ -25,7 +25,7 @@ describe("guppy.http.server.DefaultRouter", () => {
             })
         );
 
-        return router.build();
+        router.build();
     });
 
     it("registers a parameterized route", () => {

@@ -26,8 +26,8 @@ export class ValidationBundle extends Bundle {
             )
             .extend(
                 MiddlewareRegistry,
-                async (middlewareRegistry: MiddlewareRegistry) => middlewareRegistry.register(
-                    await container.get(ValidationMiddleware)
+                (middlewareRegistry: MiddlewareRegistry) => middlewareRegistry.register(
+                    container.get(ValidationMiddleware)
                 )
             );
     }

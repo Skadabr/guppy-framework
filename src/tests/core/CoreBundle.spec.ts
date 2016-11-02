@@ -43,8 +43,6 @@ describe("guppy.core.CoreBundle", () => {
         coreBundle.config(config);
         coreBundle.services(container, configState);
 
-        return container
-            .get(Logger)
-            .then((logger: Logger) => assert.ok(logger instanceof Logger));
+        assert.ok(container.get(Logger) instanceof Logger);
     });
 });

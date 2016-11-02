@@ -28,17 +28,16 @@ describe("guppy.presenter.PresenterBundle", () => {
     });
 
     it("registers a Presenter service", () => {
+
         const configState = new ConfigState();
         const container = new Container();
 
         presenterBundle.services(container, configState);
 
-        return container
-            .get(Presenter)
-            .then((presenter: Presenter) => {
-                assert.ok(presenter instanceof RootPresenter);
-                assert.ok(presenter instanceof Presenter);
-            });
+        const presenter: Presenter = container.get(Presenter);
+
+        assert.ok(presenter instanceof RootPresenter);
+        assert.ok(presenter instanceof Presenter);
     });
 
     it("registers a Presenter service with custom presenters", () => {
@@ -72,19 +71,15 @@ describe("guppy.presenter.PresenterBundle", () => {
             )
             .extend(
                 Presenter,
-                async (presenter: RootPresenter) => presenter.register(
+                (presenter: RootPresenter) => presenter.register(
                     User,
-                    await container.get(UserPresenter)
+                    container.get(UserPresenter)
                 )
             );
 
-        return container
-            .get(Presenter)
-            .then(presenter => {
-                assert.equal(
-                    presenter.present(new User(8, "Alex")), 
-                    JSON.stringify({ id: 8, fullName: "Alex" })
-                );
-            });
+        assert.equal(
+            container.get(Presenter).present(new User(8, "Alex")),
+            JSON.stringify({ id: 8, fullName: "Alex" })
+        );
     });
 });

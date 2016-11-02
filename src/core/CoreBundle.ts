@@ -1,8 +1,7 @@
 import { Bundle } from "./Bundle";
 import { Config, ConfigState } from "./Config";
 import { Container } from "./Container";
-import { LoggerFactory, Logger, Log4jsLoggerFactory } from "./logger";
-import {LogLevel} from "./logger/LoggerFactory";
+import { LoggerFactory, Logger, Log4jsLoggerFactory, LogLevel } from "./logger";
 
 export class CoreBundle implements Bundle {
 
@@ -34,18 +33,18 @@ export class CoreBundle implements Bundle {
                 Log4jsLoggerFactory,
                 () => new Log4jsLoggerFactory(
                     <LogLevel> config.get("guppy.core.logger.level"),
-                    config.get("guppy.core.logger.appenders") as any
+                    <any> config.get("guppy.core.logger.appenders")
                 )
             )
             .factory(
                 LoggerFactory,
-                async () => container.get(
-                    config.get("guppy.core.logger.factoryClass") as any
+                () => container.get(
+                    <any> config.get("guppy.core.logger.factoryClass")
                 )
             )
             .factory(
                 Logger,
-                async () => (await container.get(LoggerFactory)).createLogger("[default]")
+                () => container.get(LoggerFactory).createLogger("[default]")
             );
     }
 }

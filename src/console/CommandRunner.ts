@@ -19,7 +19,7 @@ export class CommandRunner {
         return this.handleCommand(argv.length > 1 ? argv.slice(1) : [DEFAULT_COMMAND]);
     }
 
-    private async handleCommand(argv: Array<string>) {
+    private handleCommand(argv: Array<string>) {
 
         let inputCommand: string = argv[0];
 
@@ -30,11 +30,11 @@ export class CommandRunner {
             return;
         }
 
-        return this.container
-            .get<Command>(availableCommands[inputCommand])
-            .then((command: Command) => command.execute(
-                new ConsoleInputProcessor().process(argv.slice(1), command),
-                this.consoleOutput
-            ));
+        const command: Command = this.container.get<Command>(availableCommands[inputCommand]);
+
+        return command.execute(
+            new ConsoleInputProcessor().process(argv.slice(1), command),
+            this.consoleOutput
+        );
     }
 }

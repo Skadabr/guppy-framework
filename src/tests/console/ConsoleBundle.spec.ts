@@ -36,10 +36,7 @@ describe("guppy.console.ConsoleBundle", () => {
 
         consoleBundle.services(container, configState);
 
-        return container.get(ConsoleWriter)
-            .then((consoleWriter: ConsoleWriter) => {
-                assert.ok(consoleWriter instanceof ConsoleWriter);
-            });
+        assert.ok(container.get(ConsoleWriter) instanceof ConsoleWriter);
     });
 
 });

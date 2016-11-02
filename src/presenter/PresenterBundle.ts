@@ -5,8 +5,6 @@ import { Container }            from "../core/Container";
 import { Presenter } from "./Presenter";
 import { RootPresenter } from "./RootPresenter";
 
-export const PRESENTER_TAG = "guppy.presenter";
-
 export class PresenterBundle extends Bundle {
 
     name(): string {
@@ -23,6 +21,6 @@ export class PresenterBundle extends Bundle {
 
     services(container: Container, config: ConfigState): void {
         container
-            .factory(Presenter, async () => new RootPresenter());
+            .factory(Presenter, () => new RootPresenter());
     }
 }

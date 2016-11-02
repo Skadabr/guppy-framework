@@ -1,10 +1,6 @@
-import { HelpCommand } from "./commands/HelpCommand";
 import { ConsoleOutput, CommandRunner, ConsoleBundle } from ".";
-import { Application, Container, Bundle, ServiceDefinition } from "../core";
-import { VERSION } from "..";
+import { Application, Container, Bundle } from "../core";
 import { CommandRegistry } from "./CommandRegistry";
-
-export const COMMAND_TAG = "guppy.console.command";
 
 export class ConsoleApplication {
 
@@ -21,15 +17,13 @@ export class ConsoleApplication {
 
         return defaultApplication
             .run(argv)
-            .then(async (container: Container) => {
+            .then((container: Container) => {
 
-                const commandRunner = new CommandRunner(
+                new CommandRunner(
                     container,
-                    await container.get(CommandRegistry),
-                    await container.get(ConsoleOutput)
-                );
-
-                await commandRunner.process(argv);
+                    container.get(CommandRegistry),
+                    container.get(ConsoleOutput)
+                ).process(argv);
 
                 return container;
             });

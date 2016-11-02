@@ -44,7 +44,7 @@ describe("guppy.http.server.HttpBundle", () => {
         assert.equal(configState.get("guppy.http.serverPort"), 4512);
     });
 
-    it("registers all required services", async () => {
+    it("registers all required services", () => {
         const configState = new ConfigState();
         const container = new Container();
 
@@ -57,25 +57,23 @@ describe("guppy.http.server.HttpBundle", () => {
 
         httpBundle.services(container, configState);
 
-        assert.ok(await container.get(Router) instanceof Router);
-        assert.ok(await container.get(MiddlewareRegistry) instanceof MiddlewareRegistry);
-        assert.ok(await container.get(RouteRegistry) instanceof RouteRegistry);
-        assert.ok(await container.get(HttpServer) instanceof HttpServer);
-        assert.ok(await container.get(HttpServerCommand) instanceof HttpServerCommand);
-        assert.ok(await container.get(HttpRoutesCommand) instanceof HttpRoutesCommand);
+        assert.ok(container.get(Router) instanceof Router);
+        assert.ok(container.get(MiddlewareRegistry) instanceof MiddlewareRegistry);
+        assert.ok(container.get(RouteRegistry) instanceof RouteRegistry);
+        assert.ok(container.get(HttpServer) instanceof HttpServer);
+        assert.ok(container.get(HttpServerCommand) instanceof HttpServerCommand);
+        assert.ok(container.get(HttpRoutesCommand) instanceof HttpRoutesCommand);
 
-        return container
-            .get(CommandRegistry)
-            .then((commandRegistry: CommandRegistry) => {
-                const allRegisteredCommands = commandRegistry.all();
-                assert.ok(allRegisteredCommands.hasOwnProperty("http:server"));
-                assert.equal(allRegisteredCommands["http:server"], HttpServerCommand);
-                assert.ok(allRegisteredCommands.hasOwnProperty("http:routes"));
-                assert.equal(allRegisteredCommands["http:routes"], HttpRoutesCommand);
-            });
+        const commandRegistry: CommandRegistry = container.get(CommandRegistry);
+        const allRegisteredCommands = commandRegistry.all();
+
+        assert.ok(allRegisteredCommands.hasOwnProperty("http:server"));
+        assert.equal(allRegisteredCommands["http:server"], HttpServerCommand);
+        assert.ok(allRegisteredCommands.hasOwnProperty("http:routes"));
+        assert.equal(allRegisteredCommands["http:routes"], HttpRoutesCommand);
     });
 
-    it("loads a port for http server from config", async () => {
+    it("loads a port for http server from config", () => {
         const configState = new ConfigState();
         const config = new DefaultConfig(configState);
         const container = new Container();
@@ -92,7 +90,7 @@ describe("guppy.http.server.HttpBundle", () => {
         httpBundle.config(config);
         httpBundle.services(container, configState);
 
-        const httpServerCommand = await container.get(HttpServerCommand);
+        const httpServerCommand = container.get(HttpServerCommand);
 
         assert.equal(httpServerCommand.serverPort, 2310);
     });

@@ -16,24 +16,22 @@ export class DefaultRouter extends Router {
         super();
     }
 
-    public build(): Promise<void> {
-        return this.routeBuilder
-            .build()
-            .then(routeHandlers => {
+    public build(): void {
 
-                let currentRouteHandler;
+        const routeHandlers = this.routeBuilder.build();
 
-                for (let routeHandlerId in routeHandlers) {
+        let currentRouteHandler;
 
-                    currentRouteHandler = routeHandlers[routeHandlerId];
+        for (let routeHandlerId in routeHandlers) {
 
-                    this.register(
-                        currentRouteHandler.method,
-                        currentRouteHandler.route,
-                        currentRouteHandler.handler
-                    );
-                }
-            });
+            currentRouteHandler = routeHandlers[routeHandlerId];
+
+            this.register(
+                currentRouteHandler.method,
+                currentRouteHandler.route,
+                currentRouteHandler.handler
+            );
+        }
     }
 
     public register(method: string, url: string, handler: RouteAction): void {
