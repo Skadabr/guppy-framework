@@ -2,8 +2,10 @@ export abstract class Config {
     public abstract section(sectionName: string): ConfigSection;
 }
 
+export type ConfigValue = any;
+
 export abstract class ConfigSection {
-    public abstract set(parameterName: string, value: string | number | boolean): ConfigSection;
+    public abstract set(parameterName: string, value: ConfigValue): ConfigSection;
     public abstract setFromEnvironment(parameterName: string, environmentVariableName: string, defaultValue?: any): ConfigSection;
     public abstract end(): Config;
 }

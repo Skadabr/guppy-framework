@@ -3,7 +3,7 @@ import assert = require("assert");
 import { ConsoleInput, ConsoleOutput } from "../../../../console";
 import { HttpServer } from "../../../../http/server";
 import { HttpServerCommand } from "../../../../http/server/commands/HttpServerCommand";
-import { Logger } from "../../../../logging/Logger";
+import { Logger } from "../../../../core/logger";
 
 function mock<T>(data: Object): T {
     return <T> data;

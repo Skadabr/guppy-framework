@@ -5,8 +5,9 @@ import { DefaultConfig, ConfigState, Container } from "../../../core";
 import { HttpBundle, HttpServer, RouteRegistry, Router, MiddlewareRegistry } from "../../../http/server";
 import { HttpServerCommand } from "../../../http/server/commands/HttpServerCommand";
 import { HttpRoutesCommand } from "../../../http/server/commands/HttpRoutesCommand";
-import { Logger } from "../../../logging/Logger";
+import { Logger } from "../../../core/logger";
 import { Presenter, RootPresenter } from "../../../presenter";
+import {LoggerFactory} from "../../../core/logger/LoggerFactory";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -49,7 +50,9 @@ describe("guppy.http.server.HttpBundle", () => {
 
         container.instance(CommandRegistry, new CommandRegistry());
         container.instance(Presenter, new RootPresenter());
-        container.instance(Logger, mock<Logger>());
+        container.instance(LoggerFactory, mock<LoggerFactory>({
+            createLogger: (loggerName: string) => mock<Logger>()
+        }));
         container.instance(ConsoleOutput, mock<ConsoleOutput>());
 
         httpBundle.services(container, configState);
@@ -80,7 +83,9 @@ describe("guppy.http.server.HttpBundle", () => {
 
         container.instance(CommandRegistry, commandRegistry);
         container.instance(Presenter, new RootPresenter());
-        container.instance(Logger, mock<Logger>());
+        container.instance(LoggerFactory, mock<LoggerFactory>({
+            createLogger: (loggerName: string) => mock<Logger>()
+        }));
         container.instance(ConsoleOutput, mock<ConsoleOutput>());
 
         process.env.APP_PORT = 2310;

@@ -7,20 +7,20 @@ import * as log4js from "log4js";
 
 export class Log4jsLoggerFactory extends LoggerFactory {
 
-    public constructor() {
+    public constructor(
+        private defaultLogLevel: LogLevel,
+        appenders: log4js.AppenderConfig[]
+    ) {
         super();
-        log4js.configure({
-            appenders: [
-                { type: "console" },
-                { type: "file", filename: "logs/guppy.log" },
-            ]
-        });
+        log4js.configure({ appenders: appenders });
     }
 
-    public createLogger(logLevel: LogLevel, loggerName?: string): Log4jsLogger {
+    public createLogger(loggerName: string, logLevel?: LogLevel): Log4jsLogger {
 
         const nativeLogger = log4js.getLogger(loggerName);
         const logger = new Log4jsLogger();
+        
+        nativeLogger.setLevel(logLevel || this.defaultLogLevel);
 
         logger.trace = nativeLogger.trace.bind(nativeLogger);
         logger.debug = nativeLogger.debug.bind(nativeLogger);

@@ -8,10 +8,10 @@ import { Presenter } from "../../presenter/Presenter";
 import { CommandRegistry } from "../../console/CommandRegistry";
 import { RouteRegistry } from "./RouteRegistry";
 import { Router, DefaultRouter } from ".";
-import {MiddlewareRegistry} from "./MiddlewareRegistry";
-import {RouteBuilder} from "./RouteBuilder";
-import {ErrorHandlerRegistry} from "./ErrorHandlerRegistry";
-import {Logger} from "../../logging/Logger";
+import { MiddlewareRegistry } from "./MiddlewareRegistry";
+import { RouteBuilder } from "./RouteBuilder";
+import { ErrorHandlerRegistry } from "./ErrorHandlerRegistry";
+import { LoggerFactory } from "../../core/logger";
 
 export class HttpBundle implements Bundle {
 
@@ -52,7 +52,7 @@ export class HttpBundle implements Bundle {
                 HttpServerCommand,
                 async () => new HttpServerCommand(
                     await container.get(HttpServer),
-                    await container.get(Logger),
+                    (await container.get(LoggerFactory)).createLogger("[http]"),
                     config.has("guppy.http.serverPort")
                         ? parseInt(<string> config.get("guppy.http.serverPort"))
                         : null
