@@ -30,6 +30,16 @@ export const DefaultFetchers = {
     }
 };
 
+export function parseFunctionArgumentNames(originalHandler: Function) {
+
+    let matches = originalHandler.toString().match(/^[^(]*\(([^)]*)\)/);
+    let argumentsString = matches[1].replace(/\s+/, '');
+
+    return argumentsString.length > 0
+        ? argumentsString.split(',')
+        : [];
+}
+
 export class RouteBuilder {
 
     public constructor(
@@ -84,7 +94,7 @@ export class RouteBuilder {
                     dependencies.get(currentRoute.controllerClass),
                     originalHandler,
                     this.createArgumentFetchers(
-                        this.parseArgumentNames(originalHandler),
+                        parseFunctionArgumentNames(originalHandler),
                         this.getArgumentTypes(controllerClass, currentRoute.handlerName),
                         dependencies
                     )
@@ -104,21 +114,6 @@ export class RouteBuilder {
         }
 
         return routeHandlers;
-    }
-
-    private parseArgumentNames(originalHandler: Function) {
-
-        let matches = originalHandler.toString().match(/^[^(]+\(([^)]*)\)/);
-
-        if (!matches) {
-            throw new Error("Cannot parse argument list");
-        }
-
-        let argumentsString = matches[1].replace(/\s+/, '');
-
-        return argumentsString.length > 0
-            ? argumentsString.split(',')
-            : [];
     }
 
     private createHandler(

@@ -7,7 +7,23 @@ describe("guppy.core.logger.Log4jsLoggerFactory", () => {
 
     it("creates a logger with specified log level", () => {
 
-        const loggerFactory = new Log4jsLoggerFactory("INFO", []);
+        const loggerFactory = new Log4jsLoggerFactory(
+            {
+                configure: (options: any) => {},
+                getLogger: (loggerName: string) => ({
+                    setLevel: (level: string) => {},
+                    trace: (message: string, ...args: any[]) => {},
+                    debug: (message: string, ...args: any[]) => {},
+                    info: (message: string, ...args: any[]) => {},
+                    warn: (message: string, ...args: any[]) => {},
+                    error: (message: string, ...args: any[]) => {},
+                    fatal: (message: string, ...args: any[]) => {}
+                })
+            },
+            "INFO",
+            []
+        );
+
         const logger = loggerFactory.createLogger("testLogger", "ERROR");
 
         // It replaces defined methods via log4js's methods
@@ -22,7 +38,22 @@ describe("guppy.core.logger.Log4jsLoggerFactory", () => {
 
     it("creates a logger with default log level", () => {
 
-        const loggerFactory = new Log4jsLoggerFactory("INFO", []);
+        const loggerFactory = new Log4jsLoggerFactory(
+            {
+                configure: (options: any) => {},
+                getLogger: (loggerName: string) => ({
+                    setLevel: (level: string) => {},
+                    trace: (message: string, ...args: any[]) => {},
+                    debug: (message: string, ...args: any[]) => {},
+                    info: (message: string, ...args: any[]) => {},
+                    warn: (message: string, ...args: any[]) => {},
+                    error: (message: string, ...args: any[]) => {},
+                    fatal: (message: string, ...args: any[]) => {}
+                })
+            },
+            "INFO",
+            []
+        );
         const logger = loggerFactory.createLogger("testLogger");
 
         // It replaces defined methods via log4js's methods

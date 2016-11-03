@@ -12,9 +12,9 @@ export abstract class ConfigSection {
 
 export class ConfigState {
 
-    private _parameters: Map<string, string | number | boolean> = new Map();
+    private _parameters: Map<string, ConfigValue> = new Map();
 
-    public set(parameterName: string, value: string | number | boolean): void {
+    public set(parameterName: string, value: ConfigValue): void {
         this._parameters.set(parameterName, value);
     }
 

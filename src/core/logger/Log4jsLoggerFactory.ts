@@ -1,15 +1,12 @@
-/// <reference path="./log4js.d.ts"/>
-
 import { Log4jsLogger } from "./Log4jsLogger";
 import { LoggerFactory, LogLevel } from "./LoggerFactory";
-
-import * as log4js from "log4js";
 
 export class Log4jsLoggerFactory extends LoggerFactory {
 
     public constructor(
+        private log4js: any,
         private defaultLogLevel: LogLevel,
-        appenders: log4js.AppenderConfig[]
+        appenders: Object[]
     ) {
         super();
         log4js.configure({ appenders: appenders });
@@ -17,7 +14,7 @@ export class Log4jsLoggerFactory extends LoggerFactory {
 
     public createLogger(loggerName: string, logLevel?: LogLevel): Log4jsLogger {
 
-        const nativeLogger = log4js.getLogger(loggerName);
+        const nativeLogger = this.log4js.getLogger(loggerName);
         const logger = new Log4jsLogger();
         
         nativeLogger.setLevel(logLevel || this.defaultLogLevel);

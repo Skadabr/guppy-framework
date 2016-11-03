@@ -1,5 +1,5 @@
 import { Response, Request } from "../../../http";
-import { DefaultRouter, RouteBuilder } from "../../../http/server";
+import { DefaultRouter, RouteBuilder, parseFunctionArgumentNames } from "../../../http/server";
 
 import assert = require("assert");
 
@@ -7,13 +7,50 @@ function mock<T>(data?: Object): T {
     return <T> (data || {});
 }
 
+describe("guppy.http.server.parseFunctionArgumentNames", () => {
+
+    it("parses a function without arguments", () => {
+
+        assert.deepEqual(
+            parseFunctionArgumentNames(function() {
+            }),
+            []
+        );
+    });
+
+    it("parses a function with arguments", () => {
+
+        assert.deepEqual(
+            parseFunctionArgumentNames(function(firstName, lastName) {
+            }),
+            ["firstName", "lastName"]
+        );
+    });
+
+    it("parses an arrow function without arguments", () => {
+
+        assert.deepEqual(
+            parseFunctionArgumentNames(() => {}),
+            []
+        );
+    });
+
+    it("parses a function with arguments", () => {
+
+        assert.deepEqual(
+            parseFunctionArgumentNames((firstName, lastName) => {}),
+            ["firstName", "lastName"]
+        );
+    });
+});
+
 describe("guppy.http.server.DefaultRouter", () => {
 
     it("registers a route", () => {
 
         const router = new DefaultRouter(
             mock<RouteBuilder>({
-                build: () => Promise.resolve([
+                build: () => [
                     {
                         method: "GET",
                         route: "/users",
@@ -21,7 +58,7 @@ describe("guppy.http.server.DefaultRouter", () => {
                             Response.ok({})
                         )
                     }
-                ])
+                ]
             })
         );
 
@@ -32,7 +69,7 @@ describe("guppy.http.server.DefaultRouter", () => {
 
         const router = new DefaultRouter(
             mock<RouteBuilder>({
-                build: () => Promise.resolve([])
+                build: () => []
             })
         );
 
@@ -49,7 +86,7 @@ describe("guppy.http.server.DefaultRouter", () => {
 
         const router = new DefaultRouter(
             mock<RouteBuilder>({
-                build: () => Promise.resolve([])
+                build: () => []
             })
         );
 
@@ -78,7 +115,7 @@ describe("guppy.http.server.DefaultRouter", () => {
         
         const router = new DefaultRouter(
             mock<RouteBuilder>({
-                build: () => Promise.resolve([])
+                build: () => []
             })
         );
 

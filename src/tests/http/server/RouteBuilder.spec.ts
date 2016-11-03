@@ -4,6 +4,7 @@ import { Container } from "../../../core";
 import { Path, Get, Request, Response } from "../../../http";
 import { RouteBuilder, RouteHandler, RouteRegistry, MiddlewareRegistry } from "../../../http/server";
 import {IncomingMessage} from "http";
+import {RouteAction} from "../../../http/server/Router";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -112,6 +113,69 @@ describe("guppy.http.server.RouteBuilder", () => {
                     originalUserId: "1",
                     userId: 1,
                     userSlug: "Alex"
+                });
+            });
+    });
+
+    it("builds a handler covered by middlewares", () => {
+
+        RouteRegistry.prebootClear();
+
+        class UserController {
+
+            @Get("/users")
+            list() {
+                return Promise.resolve(
+                    Response.ok({ message: "List of Users" })
+                );
+            }
+        }
+
+        const container: Container = new Container();
+        const routeRegistry: RouteRegistry = new RouteRegistry();
+        const middlewareRegistry: MiddlewareRegistry = new MiddlewareRegistry();
+        const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry);
+
+        container.instance(RouteRegistry, routeRegistry);
+        container.factory(UserController, () => new UserController());
+
+        middlewareRegistry.register({
+            handle: (request: Request, next: RouteAction): Promise<Response> => {
+                return next(request)
+                    .then((response: Response) => {
+                        const content = response.content();
+                        content["anotherMessage"] = "From Middleware";
+                        return response.setContent(content);
+                    })
+            }
+        });
+
+        const routeHandlers: RouteHandler[] = routeBuilder.build();
+
+        assert.equal(routeHandlers.length, 1);
+        assert.equal(routeHandlers[0].method, "GET");
+        assert.equal(routeHandlers[0].route, "/users");
+
+        return routeHandlers[0]
+            .handler(
+                new Request(
+                    mock<IncomingMessage>({
+                        method: "GET",
+                        url: "/users/1/Alex",
+                        headers: { },
+                        connection: {
+                            remoteAddress: "127.0.0.1"
+                        }
+                    }),
+                    {},
+                    {},
+                    {}
+                )
+            )
+            .then((response: Response) => {
+                assert.deepEqual(response.content(), {
+                    anotherMessage: "From Middleware",
+                    message: "List of Users"
                 });
             });
     });

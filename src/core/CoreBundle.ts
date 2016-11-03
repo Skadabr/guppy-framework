@@ -1,7 +1,11 @@
+/// <reference path="./logger/log4js.d.ts"/>
+
 import { Bundle } from "./Bundle";
 import { Config, ConfigState } from "./Config";
 import { Container } from "./Container";
 import { LoggerFactory, Logger, Log4jsLoggerFactory, LogLevel } from "./logger";
+
+import * as log4js from "log4js";
 
 export class CoreBundle implements Bundle {
 
@@ -32,6 +36,7 @@ export class CoreBundle implements Bundle {
             .factory(
                 Log4jsLoggerFactory,
                 () => new Log4jsLoggerFactory(
+                    log4js,
                     <LogLevel> config.get("guppy.core.logger.level"),
                     <any> config.get("guppy.core.logger.appenders")
                 )

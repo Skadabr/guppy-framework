@@ -41,6 +41,11 @@ describe("guppy.core.CoreBundle", () => {
         const container = new Container();
 
         coreBundle.config(config);
+
+        configState.set("guppy.core.logger.appenders", [
+            { type: "console" }
+        ]);
+
         coreBundle.services(container, configState);
 
         assert.ok(container.get(Logger) instanceof Logger);

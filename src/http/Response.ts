@@ -24,6 +24,11 @@ export class Response {
         return this._content;
     }
 
+    public setContent(content: any): Response {
+        this._content = content;
+        return this;
+    }
+
     public headers(): Headers {
         return this._headers;
     }
