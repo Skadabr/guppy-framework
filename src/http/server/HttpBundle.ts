@@ -52,7 +52,7 @@ export class HttpBundle implements Bundle {
                 HttpServerCommand,
                 () => new HttpServerCommand(
                     container.get(HttpServer),
-                    container.get(LoggerFactory).createLogger("[http]"),
+                    container.get(LoggerFactory).createLogger("http"),
                     config.has("guppy.http.serverPort")
                         ? parseInt(<string> config.get("guppy.http.serverPort"))
                         : null

@@ -14,7 +14,7 @@ export class Log4jsLoggerFactory extends LoggerFactory {
 
     public createLogger(loggerName: string, logLevel?: LogLevel): Log4jsLogger {
 
-        const nativeLogger = this.log4js.getLogger(loggerName);
+        const nativeLogger = this.log4js.getLogger(`[${loggerName}]`);
         const logger = new Log4jsLogger();
         
         nativeLogger.setLevel(logLevel || this.defaultLogLevel);

@@ -1,3 +1,5 @@
+// This file is part of: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/log4js/log4js.d.ts
+
 declare module "log4js" {
 
     export interface Logger {

@@ -18,7 +18,7 @@ export class ConfigState {
         this._parameters.set(parameterName, value);
     }
 
-    public get(parameterName: string): string | number | boolean | number {
+    public get(parameterName: string): ConfigValue {
         return this._parameters.get(parameterName) || null;
     }
 

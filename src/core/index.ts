@@ -1,3 +1,4 @@
+export * from "./logger";
 export * from "./Application";
 export * from "./Bundle";
 export * from "./CoreBundle";
