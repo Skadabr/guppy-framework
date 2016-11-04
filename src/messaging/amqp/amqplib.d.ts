@@ -90,6 +90,7 @@ declare module "amqplib" {
         consume(queue: string, onMessage: (msg: Message) => any, options?: ConsumeOptions): Promise<Consume>;
         ack(message: Message, allUpTo?: boolean): void;
         publish(exchange: string, routingKey: string, content: Buffer, options?: PublishOptions): boolean;
+        prefetch(count: number, global?: boolean): Promise<Empty>;
         close(): Promise<void>;
     }
 

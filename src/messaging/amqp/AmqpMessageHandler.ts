@@ -4,10 +4,7 @@ import { Class, Logger } from "../../core";
 import * as amqplib from "amqplib";
 
 export function createMessage<T>(messageClass: { new(): T; }, data: Object): T {
-    return Object.assign(
-        new messageClass(),
-        data
-    );
+    return Object.assign(new messageClass(), data);
 }
 
 export class AmqpMessageHandler<T> extends MessageHandler<T> {
@@ -42,16 +39,15 @@ export class AmqpMessageHandler<T> extends MessageHandler<T> {
                         content
                     );
 
-                    this.handler(
-                        createMessage(
-                            this.messageClass as any,
-                            JSON.parse(content)
-                        )
+                    const result = this.handler(
+                        createMessage(this.messageClass as any, JSON.parse(content))
                     );
 
-                    setTimeout(() => {
+                    if (result && typeof result["then"] === "function") {
+                        result.then(() => this.channel.ack(message));
+                    } else {
                         this.channel.ack(message);
-                    }, 5000);
+                    }
                 },
                 { noAck: false }
             )
