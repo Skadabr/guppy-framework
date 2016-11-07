@@ -1,4 +1,4 @@
-export type MessageListener = (message: Message) => void;
+export type MessageListener = (message: Message) => Promise<void>;
 export type Destination = string;
 
 export enum AcknowledgeMode {
@@ -6,32 +6,33 @@ export enum AcknowledgeMode {
     ClientAcknowledge
 }
 
-export interface ConnectionFactory {
-
+export abstract class ConnectionFactory {
+    public abstract createConnection(): Connection;
 }
 
-export interface Connection {
-    start(): void;
-    close();
+export abstract class Connection {
+    public abstract createQueueSession(transacted: boolean, acknowledgeMode: AcknowledgeMode): Promise<Session>;
+    public abstract createTopicSession(transacted: boolean, acknowledgeMode: AcknowledgeMode): Promise<Session>;
+    public abstract close(): Promise<void>;
 }
 
-export interface Session {
-    createTextMessage(content: string): Message;
-    createMessage(content: Buffer): Message;
-    close();
+export abstract class Session {
+    public abstract createConsumer(destination: Destination): Promise<Consumer>;
+    public abstract createProducer(destination: Destination): Promise<Producer>;
+    public abstract close(): Promise<void>;
 }
 
-export interface Message {
-    acknowledge();
-    getRaw(): Buffer;
+export abstract class Message {
+    public abstract acknowledge(): void;
+    public abstract getRaw(): Buffer;
 }
 
-export interface MessageConsumer {
-    setMessageListener(messageListener: MessageListener);
-    close();
+export abstract class Consumer {
+    public abstract setMessageListener(messageListener: MessageListener);
+    public abstract close(): Promise<void>;
 }
 
-export interface MessageProducer {
-    send(message: Message);
-    close();
+export abstract class Producer {
+    public abstract send(message: Buffer): void;
+    public abstract close(): Promise<void>;
 }

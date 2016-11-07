@@ -2,10 +2,10 @@ import { Bundle, Container, Config, ConfigState } from "../core";
 import { MessageHandlerFactory } from "./MessageHandlerFactory";
 import { PublisherFactory } from "./PublisherFactory";
 import { StubPublisherFactory } from "./StubPublisherFactory";
-import { StubMessageHandlerFactory } from "./StubMessageHandlerFactory";
 import { CommandRegistry } from "../console/CommandRegistry";
 import { MessagingServeCommand } from "./commands/MessagingServeCommand";
 import { ObserverRegistry } from "./ObserverRegistry";
+import { DefaultMessageHandlerFactory } from "./DefaultMessageHandlerFactory";
 
 export class MessagingBundle extends Bundle {
 
@@ -21,7 +21,7 @@ export class MessagingBundle extends Bundle {
 
         config
             .section("guppy.messaging")
-                .set("messageHandlerFactoryClass", StubMessageHandlerFactory)
+                .set("messageHandlerFactoryClass", DefaultMessageHandlerFactory)
                 .set("publisherFactoryClass", StubPublisherFactory)
             .end();
     }
@@ -29,8 +29,6 @@ export class MessagingBundle extends Bundle {
     public services(container: Container, config: ConfigState): void {
 
         container
-            .factory(StubMessageHandlerFactory, () => new StubMessageHandlerFactory())
-            .factory(StubPublisherFactory, () => new StubPublisherFactory())
             .factory(MessageHandlerFactory, () => container.get(
                 config.get("guppy.messaging.messageHandlerFactoryClass") as Function
             ))
