@@ -1,5 +1,6 @@
-# Guppy [![Version](https://img.shields.io/npm/v/guppy.svg)](https://www.npmjs.com/package/guppy) [![Travis CI](https://img.shields.io/travis/nexode/guppy-framework.svg)](https://travis-ci.org/nexode/guppy-framework)
-
+# Guppy
+[![Version](https://img.shields.io/npm/v/guppy.svg)](https://www.npmjs.com/package/guppy)
+[![Travis CI](https://img.shields.io/travis/nexode/guppy-framework.svg)](https://travis-ci.org/nexode/guppy-framework)
 [![Coverage Status](https://img.shields.io/coveralls/nexode/guppy-framework.svg)](https://coveralls.io/github/nexode/guppy-framework)
 [![Dependencies](https://img.shields.io/versioneye/d/user/projects/580f702691281513b1714232.svg)](https://www.versioneye.com/user/projects/580f702691281513b1714232)
 
@@ -28,14 +29,14 @@ export class UserController {
 * Console Commands
 * Module System (allows you create your own Bundles)
 * Request Validation
-* Request Streaming
+* Response Streaming
 * Error presenters
 * HTTP Middlewares
 * Logger
+* Native Queue supporting (AMQP)
 
 ## Roadmap
 
-* Native Queue supporting
 * Multithreaded HTTP server
 * HTTP Client (for microservice communication)
 * DBAL supporting

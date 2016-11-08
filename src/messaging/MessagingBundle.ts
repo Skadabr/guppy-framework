@@ -7,13 +7,7 @@ import { ObserverRegistry } from "./ObserverRegistry";
 import { DefaultMessageHandlerFactory } from "./DefaultMessageHandlerFactory";
 import { DefaultPublisherFactory } from "./DefaultPublisherFactory";
 import { TopicConnectionFactory, QueueConnectionFactory } from "./platform/abstract/index";
-import { Logger } from "../core/logger/Logger";
-import { AmqpQueueConnectionFactory } from "./platform/amqp/AmqpQueueConnectionFactory";
-import { AmqpConnectionFactory } from "./platform/amqp/AmqpConnectionFactory";
-import { AmqpTopicConnectionFactory } from "./platform/amqp/AmqpTopicConnectionFactory";
-
-import * as amqplib from "amqplib";
-import {LoggerFactory} from "../core/logger/LoggerFactory";
+import { LoggerFactory } from "../core/logger/LoggerFactory";
 
 export class MessagingBundle extends Bundle {
 
@@ -26,7 +20,6 @@ export class MessagingBundle extends Bundle {
     }
 
     public config(config: Config): void {
-
         config
             .section("guppy.messaging")
                 .set("messageHandlerFactoryClass", DefaultMessageHandlerFactory)
@@ -35,23 +28,6 @@ export class MessagingBundle extends Bundle {
     }
 
     public services(container: Container, config: ConfigState): void {
-
-        container
-            .factory(AmqpConnectionFactory, () => new AmqpConnectionFactory(
-                config.get("guppy.messaging.amqp.url"),
-                amqplib
-            ))
-            .factory(AmqpQueueConnectionFactory, () => new AmqpQueueConnectionFactory(
-                container.get(AmqpConnectionFactory)
-            ))
-            .factory(AmqpTopicConnectionFactory, () => new AmqpTopicConnectionFactory(
-                container.get(AmqpConnectionFactory)
-            ));
-
-        container
-            .factory(QueueConnectionFactory, () => container.get(AmqpQueueConnectionFactory))
-            .factory(TopicConnectionFactory, () => container.get(AmqpTopicConnectionFactory));
-
         container
             .factory(DefaultMessageHandlerFactory, () => new DefaultMessageHandlerFactory(
                 container.get(TopicConnectionFactory),
