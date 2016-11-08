@@ -6,13 +6,16 @@ export enum AcknowledgeMode {
     ClientAcknowledge
 }
 
-export abstract class ConnectionFactory {
+export abstract class QueueConnectionFactory {
+    public abstract createConnection(): Connection;
+}
+
+export abstract class TopicConnectionFactory {
     public abstract createConnection(): Connection;
 }
 
 export abstract class Connection {
-    public abstract createQueueSession(transacted: boolean, acknowledgeMode: AcknowledgeMode): Promise<Session>;
-    public abstract createTopicSession(transacted: boolean, acknowledgeMode: AcknowledgeMode): Promise<Session>;
+    public abstract createSession(transacted: boolean, acknowledgeMode: AcknowledgeMode): Promise<Session>;
     public abstract close(): Promise<void>;
 }
 

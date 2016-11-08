@@ -1,11 +1,11 @@
-import { MessageHandlerFactory } from "./MessageHandlerFactory";
-import { Class, Logger } from "../core";
-import { MessageHandler } from "./MessageHandler";
-import { Session, AcknowledgeMode, Consumer, TopicConnectionFactory, QueueConnectionFactory } from "./platform/abstract";
+import { PublisherFactory } from "./PublisherFactory";
+import { Publisher } from "./Publisher";
+import { Logger, Class } from "../core";
+import { TopicConnectionFactory, QueueConnectionFactory, Session, AcknowledgeMode, Producer } from "./platform/abstract";
 import { ChannelType } from "./annotations/Message";
-import { DefaultMessageHandler } from "./DefaultMessageHandler";
+import { DefaultPublisher } from "./DefaultPublisher";
 
-export class DefaultMessageHandlerFactory extends MessageHandlerFactory {
+export class DefaultPublisherFactory extends PublisherFactory {
 
     private topicConnectionFactory: TopicConnectionFactory;
     private queueConnectionFactory: QueueConnectionFactory;
@@ -44,16 +44,14 @@ export class DefaultMessageHandlerFactory extends MessageHandlerFactory {
         }
     }
 
-    public createMessageHandler<T>(messageClass: Class<T>, handler: (T) => any): Promise<MessageHandler<T>> {
+    public createPublisher<T>(messageClass: Class<T>): Promise<Publisher<T>> {
 
         return this
             .createSession(messageClass["channelType"])
-            .then((session: Session) => session.createConsumer(messageClass["channelName"]))
-            .then((consumer: Consumer) => new DefaultMessageHandler(
-                consumer,
-                this.logger,
-                messageClass,
-                handler
-            ));
+            .then((session: Session) => session.createProducer(messageClass["channelName"]))
+            .then((producer: Producer) => {
+                this.logger.debug(`Created publisher for "%s"`, messageClass["channelName"]);
+                return new DefaultPublisher(this.logger, producer);
+            });
     }
 }

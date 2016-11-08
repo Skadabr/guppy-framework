@@ -1,6 +1,5 @@
-import { Session, Destination, Producer, Consumer } from "../common";
-import { NativeSession, NativeQueue, Exchange } from "./common";
-import { AmqpConsumer } from "./AmqpConsumer";
+import { Session, Destination, Producer, Consumer } from "../abstract";
+import { NativeSession, Exchange } from "./common";
 import { AmqpProducer } from "./AmqpProducer";
 
 export abstract class AmqpSession extends Session {
@@ -8,18 +7,13 @@ export abstract class AmqpSession extends Session {
     protected nativeSession: NativeSession;
 
     public constructor(nativeSession: NativeSession) {
+        super();
         this.nativeSession = nativeSession;
     }
 
     protected abstract ensureDestinationExists(destination: Destination): Promise<Exchange>;
 
-    public createConsumer(destination: Destination): Promise<Consumer> {
-        return this
-            .ensureDestinationExists(destination)
-            .then(() => this.nativeSession.prefetch(1))
-            .then(() => this.nativeSession.assertQueue("", { exclusive: true }))
-            .then((nativeQueue: NativeQueue) => new AmqpConsumer(this.nativeSession, nativeQueue));
-    }
+    public abstract createConsumer(destination: Destination): Promise<Consumer>;
 
     public createProducer(destination: Destination): Promise<Producer> {
         return this

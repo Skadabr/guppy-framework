@@ -49,7 +49,7 @@ export class CoreBundle implements Bundle {
             )
             .factory(
                 Logger,
-                () => container.get(LoggerFactory).createLogger("[default]")
+                () => container.get(LoggerFactory).createLogger("default")
             );
     }
 }

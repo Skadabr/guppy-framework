@@ -5,5 +5,3 @@ export * from "./MessagingBundle";
 export * from "./ObserverRegistry";
 export * from "./Publisher";
 export * from "./PublisherFactory";
-export * from "./StubMessageHandlerFactory";
-export * from "./StubPublisherFactory";

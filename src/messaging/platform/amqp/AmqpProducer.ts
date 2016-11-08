@@ -1,4 +1,4 @@
-import { Producer, Destination } from "../common";
+import { Producer, Destination } from "../abstract";
 import { NativeSession } from "./common";
 
 export class AmqpProducer extends Producer {
@@ -7,6 +7,7 @@ export class AmqpProducer extends Producer {
     private destination: Destination;
 
     public constructor(nativeSession: NativeSession, destination: Destination) {
+        super();
         this.nativeSession = nativeSession;
         this.destination = destination;
     }

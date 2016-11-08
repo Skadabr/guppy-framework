@@ -1,20 +1,22 @@
-import { ConnectionFactory, Connection} from "../common";
+import { Connection } from "../abstract";
 import { AmqpConnection } from "./AmqpConnection";
+import { NativeSession } from "./common";
+import { AmqpSession } from "./AmqpSession";
 
-export class AmqpConnectionFactory extends ConnectionFactory {
+export class AmqpConnectionFactory {
 
     private url: string;
     private amqp: any;
 
     public constructor(url: string, amqp: any) {
-        super();
         this.url = url;
         this.amqp = amqp;
     }
 
-    public createConnection(): Connection {
+    public createConnection(sessionFactory: (nativeSession: NativeSession) => AmqpSession): Connection {
         return new AmqpConnection(
-            this.amqp.connect(this.url)
+            this.amqp.connect(this.url),
+            sessionFactory
         );
     }
 }

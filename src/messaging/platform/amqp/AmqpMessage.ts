@@ -1,4 +1,4 @@
-import { Message } from "../common";
+import { Message } from "../abstract";
 import { NativeSession, NativeMessage } from "./common";
 
 export class AmqpMessage extends Message {
@@ -7,6 +7,7 @@ export class AmqpMessage extends Message {
     private nativeMessage: NativeMessage;
 
     public constructor(nativeSession: NativeSession, nativeMessage: NativeMessage) {
+        super();
         this.nativeSession = nativeSession;
         this.nativeMessage = nativeMessage;
     }

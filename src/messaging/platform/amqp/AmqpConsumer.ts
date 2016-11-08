@@ -1,19 +1,20 @@
-import { Consumer, MessageListener } from "../common";
+import { Consumer, MessageListener, Destination } from "../abstract";
 import { NativeSession, NativeQueue, NativeMessage } from "./common";
 import { AmqpMessage } from "./AmqpMessage";
 
 export class AmqpConsumer extends Consumer {
 
     private nativeSession: NativeSession;
-    private nativeQueue: NativeQueue;
+    private destination: Destination;
 
-    public constructor(nativeSession: NativeSession, nativeQueue: NativeQueue) {
+    public constructor(nativeSession: NativeSession, destination: Destination) {
+        super();
         this.nativeSession = nativeSession;
-        this.nativeQueue = nativeQueue;
+        this.destination = destination;
     }
 
     public setMessageListener(messageListener: MessageListener) {
-        this.nativeSession.consume(this.nativeQueue.queue, (nativeMessage: NativeMessage) => {
+        this.nativeSession.consume(this.destination, (nativeMessage: NativeMessage) => {
             const message = new AmqpMessage(this.nativeSession, nativeMessage);
             messageListener(message).then(() => message.acknowledge());
         });
