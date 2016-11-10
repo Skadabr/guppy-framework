@@ -5,9 +5,11 @@ import { AmqpTopicSession } from "./AmqpTopicSession";
 
 export class AmqpTopicConnectionFactory extends TopicConnectionFactory {
 
+    /** @internal */
     private connectionFactory: AmqpConnectionFactory;
 
-    public constructor(connectionFactory:AmqpConnectionFactory) {
+    /** @internal */
+    public constructor(connectionFactory: AmqpConnectionFactory) {
         super();
         this.connectionFactory = connectionFactory;
     }

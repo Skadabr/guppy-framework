@@ -4,10 +4,16 @@ import { AmqpSession } from "./AmqpSession";
 
 export class AmqpConnection extends Connection {
 
+    /** @internal */
     private nativeConnectionPromise: Promise<NativeConnection>;
+
+    /** @internal */
     private nativeConnection: NativeConnection;
+
+    /** @internal */
     private sessionFactory: (nativeSession: NativeSession) => AmqpSession;
 
+    /** @internal */
     public constructor(
         nativeConnectionPromise: Promise<NativeConnection>,
         sessionFactory: (nativeSession: NativeSession) => AmqpSession
@@ -17,6 +23,7 @@ export class AmqpConnection extends Connection {
         this.sessionFactory = sessionFactory;
     }
 
+    /** @internal */
     private getNativeConnection(): Promise<NativeConnection> {
         return (this.nativeConnection !== void 0)
             ? Promise.resolve(this.nativeConnection)
@@ -26,13 +33,15 @@ export class AmqpConnection extends Connection {
     }
 
     public createSession(transacted: boolean, acknowledgeMode: AcknowledgeMode): Promise<Session> {
-        return this.getNativeConnection()
+        return this
+            .getNativeConnection()
             .then((nativeConnection: NativeConnection) => nativeConnection.createChannel())
             .then((nativeSession: NativeSession) => this.sessionFactory(nativeSession));
     }
 
     public close(): Promise<void> {
-        return this.getNativeConnection()
+        return this
+            .getNativeConnection()
             .then((nativeConnection: NativeConnection) => nativeConnection.close());
     }
 }

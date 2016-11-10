@@ -3,6 +3,7 @@ import { AmqpConnection } from "./AmqpConnection";
 import { NativeSession } from "./common";
 import { AmqpSession } from "./AmqpSession";
 
+/** @internal */
 export class AmqpConnectionFactory {
 
     private url: string;

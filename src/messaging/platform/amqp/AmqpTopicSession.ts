@@ -4,10 +4,11 @@ import { AmqpConsumer } from "./AmqpConsumer";
 import { AmqpProducer } from "./AmqpProducer";
 import {AmqpSession} from "./AmqpSession";
 
-export const topicExchangeType = "fanout";
+const topicExchangeType = "fanout";
 
 export class AmqpTopicSession extends AmqpSession {
 
+    /** @internal */
     protected ensureDestinationExists(destination: Destination): Promise<Exchange> {
         return this.nativeSession.assertExchange(
             destination,
@@ -17,7 +18,6 @@ export class AmqpTopicSession extends AmqpSession {
     }
 
     public createConsumer(destination: Destination): Promise<Consumer> {
-
         return this
             .ensureDestinationExists(destination)
             .then(() => this.nativeSession.prefetch(1))

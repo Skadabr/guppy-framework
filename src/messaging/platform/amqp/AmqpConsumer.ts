@@ -4,9 +4,13 @@ import { AmqpMessage } from "./AmqpMessage";
 
 export class AmqpConsumer extends Consumer {
 
+    /** @internal */
     private nativeSession: NativeSession;
+
+    /** @internal */
     private destination: Destination;
 
+    /** @internal */
     public constructor(nativeSession: NativeSession, destination: Destination) {
         super();
         this.nativeSession = nativeSession;

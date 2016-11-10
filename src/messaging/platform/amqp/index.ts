@@ -1,6 +1,5 @@
 export * from "./AmqpBundle";
 export * from "./AmqpConnection";
-export * from "./AmqpConnectionFactory";
 export * from "./AmqpConsumer";
 export * from "./AmqpMessage";
 export * from "./AmqpProducer";

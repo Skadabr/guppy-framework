@@ -3,12 +3,14 @@ import { NativeSession, NativeQueue, Exchange } from "./common";
 import { AmqpConsumer } from "./AmqpConsumer";
 import { AmqpSession } from "./AmqpSession";
 
-export const queueExchangeType = "direct";
+const queueExchangeType = "direct";
 
 export class AmqpQueueSession extends AmqpSession {
 
+    /** @internal */
     protected nativeSession: NativeSession;
 
+    /** @internal */
     protected ensureDestinationExists(destination: Destination): Promise<Exchange> {
         return this.nativeSession.assertExchange(
             destination,
@@ -18,7 +20,6 @@ export class AmqpQueueSession extends AmqpSession {
     }
 
     public createConsumer(destination: Destination): Promise<Consumer> {
-
         return this
             .ensureDestinationExists(destination)
             .then(() => this.nativeSession.prefetch(1))

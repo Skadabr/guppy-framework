@@ -4,7 +4,7 @@ import { ConsoleOutput }            from "./ConsoleOutput";
 import { CommandRegistry }          from "./CommandRegistry";
 import { Container }                from "../core/Container";
 
-export const DEFAULT_COMMAND = "help";
+const DEFAULT_COMMAND = "help";
 
 export class CommandRunner {
 

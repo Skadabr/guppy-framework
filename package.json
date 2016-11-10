@@ -1,6 +1,6 @@
 {
   "name": "guppy",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Guppy Framework",
   "repository": {
     "type": "git",
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "unit": "tsc && mocha --require ts-node/register --reporter dot --recursive src/**/*.spec.ts",
+    "unit": "tsc && mocha --reporter dot --recursive dist/tests",
     "lint": "tslint ./src/**/*.ts",
     "test": "npm run unit && npm run lint",
     "coverage": "tsc && istanbul --include-all-sources cover _mocha -- --recursive ./dist/tests",

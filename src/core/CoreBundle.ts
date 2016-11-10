@@ -5,6 +5,7 @@ import { Config, ConfigState } from "./Config";
 import { Container } from "./Container";
 import { LoggerFactory, Logger, Log4jsLoggerFactory, LogLevel } from "./logger";
 
+/** @internal */
 import * as log4js from "log4js";
 
 export class CoreBundle implements Bundle {
