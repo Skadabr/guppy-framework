@@ -4,6 +4,7 @@ import * as fetch from "node-fetch";
 
 import { HttpServer, ErrorHandlerRegistry, Router } from "../../../http/server";
 import { Presenter, RootPresenter } from "../../../presenter";
+import { Logger } from "../../../core";
 
 import { StubRouter } from "./StubRouter";
 
@@ -15,11 +16,21 @@ function mock<T>(data?: Object): T {
 
 describe("guppy.http.server.HttpServer", () => {
 
+    let debugBuffer = [];
+    let errorBuffer = [];
+
     before(() => {
+        debugBuffer = [];
+        errorBuffer = [];
         httpServer = new HttpServer(
             new StubRouter(),
             new RootPresenter(),
-            new ErrorHandlerRegistry()
+            new ErrorHandlerRegistry(),
+            mock<Logger>({
+                debug(message: string, ...data: any[]) {
+                    debugBuffer.push(`${message} ${JSON.stringify(data)}`);
+                }
+            })
         );
     });
 
@@ -77,27 +88,32 @@ describe("guppy.http.server.HttpServer", () => {
                 "developerMessage": "Simulated error",
                 "userMessage": "Internal Server Error"
             });
+
+            assert.deepEqual(debugBuffer, [
+                `%s %s ["LOCK","/debug"]`,
+                `%s %s ["GET","/error"]`
+            ]);
         }
 
         await httpServer.terminate();
     });
 
-    it("cannot start a http-server on a used port", (done) => {
+    it("cannot start a http-server on a used port", () => {
 
         const secondServer = new HttpServer(
             new StubRouter(),
             new RootPresenter(),
-            new ErrorHandlerRegistry()
+            new ErrorHandlerRegistry(),
+            mock<Logger>()
         );
 
-        httpServer
+        return httpServer
             .listen(8912) // Start first server
             .then(() => secondServer.listen(8912)) // Try to start second server...
             .catch(error => error.message) // ... but we get an error
             .then(message => {
                 assert.equal(message, "listen EADDRINUSE :::8912");
                 httpServer.terminate(); // Stop first server
-                done();
             });
     });
 
@@ -106,7 +122,8 @@ describe("guppy.http.server.HttpServer", () => {
         return new HttpServer(
             new StubRouter(),
             new RootPresenter(),
-            new ErrorHandlerRegistry()
+            new ErrorHandlerRegistry(),
+            mock<Logger>()
         ).terminate();
     });
 
@@ -118,10 +135,18 @@ describe("guppy.http.server.HttpServer", () => {
                 resolve() {
                     throw new Error("Cannot be presented");
                 }
-
             }),
             mock<Presenter>(),
-            new ErrorHandlerRegistry()
+            new ErrorHandlerRegistry(),
+            mock<Logger>({
+                debug(message: string, ...data: any[]) {
+                    debugBuffer.push(`${message} ${JSON.stringify(data)}`);
+                },
+
+                error(message: string, ...data: any[]) {
+                    errorBuffer.push(`${message} ${JSON.stringify(data)}`);
+                }
+            })
         );
 
         return httpServer.listen(8914)
@@ -145,7 +170,8 @@ describe("guppy.http.server.HttpServer", () => {
                 build: () => Promise.resolve()
             }),
             mock<Presenter>(),
-            new ErrorHandlerRegistry()
+            new ErrorHandlerRegistry(),
+            mock<Logger>()
         );
 
         return httpServer

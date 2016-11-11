@@ -3,11 +3,11 @@ import assert = require("assert");
 import { ConsoleOutput, CommandRegistry } from "../../../console";
 import { DefaultConfig, ConfigState, Container } from "../../../core";
 import { HttpBundle, HttpServer, RouteRegistry, Router, MiddlewareRegistry } from "../../../http/server";
-import { HttpServerCommand } from "../../../http/server/commands/HttpServerCommand";
+import { HttpServeCommand } from "../../../http/server/commands/HttpServeCommand";
 import { HttpRoutesCommand } from "../../../http/server/commands/HttpRoutesCommand";
 import { Logger } from "../../../core/logger";
 import { Presenter, RootPresenter } from "../../../presenter";
-import {LoggerFactory} from "../../../core/logger/LoggerFactory";
+import { LoggerFactory } from "../../../core/logger/LoggerFactory";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -61,14 +61,14 @@ describe("guppy.http.server.HttpBundle", () => {
         assert.ok(container.get(MiddlewareRegistry) instanceof MiddlewareRegistry);
         assert.ok(container.get(RouteRegistry) instanceof RouteRegistry);
         assert.ok(container.get(HttpServer) instanceof HttpServer);
-        assert.ok(container.get(HttpServerCommand) instanceof HttpServerCommand);
+        assert.ok(container.get(HttpServeCommand) instanceof HttpServeCommand);
         assert.ok(container.get(HttpRoutesCommand) instanceof HttpRoutesCommand);
 
         const commandRegistry: CommandRegistry = container.get(CommandRegistry);
         const allRegisteredCommands = commandRegistry.all();
 
         assert.ok(allRegisteredCommands.hasOwnProperty("http:serve"));
-        assert.equal(allRegisteredCommands["http:serve"], HttpServerCommand);
+        assert.equal(allRegisteredCommands["http:serve"], HttpServeCommand);
         assert.ok(allRegisteredCommands.hasOwnProperty("http:routes"));
         assert.equal(allRegisteredCommands["http:routes"], HttpRoutesCommand);
     });
@@ -90,8 +90,8 @@ describe("guppy.http.server.HttpBundle", () => {
         httpBundle.config(config);
         httpBundle.services(container, configState);
 
-        const httpServerCommand = container.get(HttpServerCommand);
+        const httpServeCommand = container.get(HttpServeCommand);
 
-        assert.equal(httpServerCommand.serverPort, 2310);
+        assert.equal(httpServeCommand.serverPort, 2310);
     });
 });

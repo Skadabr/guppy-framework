@@ -2,7 +2,7 @@ import assert = require("assert");
 
 import { ConsoleInput, ConsoleOutput } from "../../../../console";
 import { HttpServer } from "../../../../http/server";
-import { HttpServerCommand } from "../../../../http/server/commands/HttpServerCommand";
+import { HttpServeCommand } from "../../../../http/server/commands/HttpServeCommand";
 import { Logger } from "../../../../core/logger";
 
 function mock<T>(data: Object): T {
@@ -44,13 +44,13 @@ class StubConsoleOutput extends ConsoleOutput {
     }
 }
 
-describe("guppy.http.server.commands.HttpServerCommand", () => {
+describe("guppy.http.server.commands.HttpServeCommand", () => {
 
     it("does not accept any arguments", () => {
 
         const httpServer = mock<HttpServer>({ });
 
-        const httpServerCommand = new HttpServerCommand(
+        const httpServerCommand = new HttpServeCommand(
             httpServer,
             mock<Logger>({ info: () => {} })
         );
@@ -74,12 +74,12 @@ describe("guppy.http.server.commands.HttpServerCommand", () => {
         const input = new ConsoleInput(new Map(), new Map());
 
         const infoOutput: string[] = [];
-        const httpServerCommand = new HttpServerCommand(
+        const httpServeCommand = new HttpServeCommand(
             httpServer,
             mock<Logger>({ info: (message: string) => infoOutput.push(message) })
         );
 
-        return httpServerCommand
+        return httpServeCommand
             .execute(input, output)
             .then(() => {
                 assert.equal(listeningPort, 8082);
@@ -103,7 +103,7 @@ describe("guppy.http.server.commands.HttpServerCommand", () => {
         const input = new ConsoleInput(new Map(), new Map());
 
         const infoOutput: string[] = [];
-        const httpServerCommand = new HttpServerCommand(
+        const httpServerCommand = new HttpServeCommand(
             httpServer,
             mock<Logger>({ info: (message: string) => infoOutput.push(message) }),
             5000
@@ -137,7 +137,7 @@ describe("guppy.http.server.commands.HttpServerCommand", () => {
         const input = new ConsoleInput(inputOption, new Map());
 
         const infoOutput: string[] = [];
-        const httpServerCommand = new HttpServerCommand(
+        const httpServerCommand = new HttpServeCommand(
             httpServer,
             mock<Logger>({ info: (message: string) => infoOutput.push(message) }),
             5000

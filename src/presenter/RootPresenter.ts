@@ -9,6 +9,9 @@ export class RootPresenter extends Presenter {
     }
 
     public present(data: any): any {
+
+        if (typeof data["constructor"] !== "function") return data;
+
         if (data.constructor.name === "Array") {
             const result = [];
 

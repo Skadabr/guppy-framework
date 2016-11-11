@@ -6,7 +6,7 @@ import { Logger } from "../../../core/logger";
 
 export const DEFAULT_HTTP_PORT = 8082;
 
-export class HttpServerCommand implements Command {
+export class HttpServeCommand implements Command {
 
     public constructor(
         private _httpServer: HttpServer,

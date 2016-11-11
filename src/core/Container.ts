@@ -11,7 +11,9 @@ export function create<T>(
     targetClass: { new(...dependencies: any[]): T; },
     dependencies?: any[]
 ): T {
-    return new targetClass(...dependencies);
+    return (dependencies === void 0)
+        ? new targetClass()
+        : new targetClass(...dependencies);
 }
 
 export class Container {

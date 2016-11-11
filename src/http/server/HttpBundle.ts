@@ -1,17 +1,15 @@
-import { Bundle } from "../../core/Bundle";
-import { Container } from "../../core/Container";
-import { Config, ConfigState } from "../../core/Config";
+import { Bundle, Config, ConfigState, Container, Logger, LoggerFactory } from "../../core";
 import { HttpServer } from "./HttpServer";
-import { HttpServerCommand } from "./commands/HttpServerCommand";
+import { HttpServeCommand } from "./commands/HttpServeCommand";
 import { HttpRoutesCommand } from "./commands/HttpRoutesCommand";
 import { Presenter } from "../../presenter/Presenter";
 import { CommandRegistry } from "../../console/CommandRegistry";
 import { RouteRegistry } from "./RouteRegistry";
-import { Router, DefaultRouter } from ".";
+import { Router } from ".";
 import { MiddlewareRegistry } from "./MiddlewareRegistry";
 import { RouteBuilder } from "./RouteBuilder";
 import { ErrorHandlerRegistry } from "./ErrorHandlerRegistry";
-import { LoggerFactory } from "../../core/logger";
+import {DefaultRouter} from "./DefaultRouter";
 
 export class HttpBundle implements Bundle {
 
@@ -38,15 +36,16 @@ export class HttpBundle implements Bundle {
                 RouteRegistry,
                 MiddlewareRegistry
             ])
-            .service(Router, [
-                RouteBuilder
-            ])
+            .factory(Router, () => new DefaultRouter(
+                container.get(RouteBuilder)
+            ))
             .service(HttpServer, [
                 Router,
                 Presenter,
-                ErrorHandlerRegistry
+                ErrorHandlerRegistry,
+                Logger
             ])
-            .factory(HttpServerCommand, () => new HttpServerCommand(
+            .factory(HttpServeCommand, () => new HttpServeCommand(
                 container.get(HttpServer),
                 container.get(LoggerFactory).createLogger("http"),
                 config.has("guppy.http.serverPort")
@@ -57,7 +56,7 @@ export class HttpBundle implements Bundle {
                 RouteRegistry
             ])
             .extend(CommandRegistry, (commandRegistry: CommandRegistry) => {
-                commandRegistry.register("http:serve", HttpServerCommand);
+                commandRegistry.register("http:serve", HttpServeCommand);
                 commandRegistry.register("http:routes", HttpRoutesCommand);
             });
     }

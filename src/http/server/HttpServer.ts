@@ -3,9 +3,9 @@ import * as http from "http";
 import { HttpSession } from "./HttpSession";
 import { Presenter } from "../../presenter/Presenter";
 import { Response } from "../Response";
-import { ResponseStatus } from "../ResponseStatus";
 import { Router } from "./Router";
-import {ErrorHandlerRegistry} from "./ErrorHandlerRegistry";
+import { ErrorHandlerRegistry } from "./ErrorHandlerRegistry";
+import { Logger } from "../../core";
 
 export class HttpServer {
 
@@ -14,24 +14,9 @@ export class HttpServer {
     public constructor(
         private _router: Router,
         private _presenter: Presenter,
-        private _errorHandlerRegistry: ErrorHandlerRegistry
+        private _errorHandlerRegistry: ErrorHandlerRegistry,
+        private _logger: Logger
     ) {
-        this._server = http.createServer((nativeRequest, nativeResponse) => {
-
-            let chunks: Buffer[] = [];
-
-            nativeRequest
-                .on('data', (chunk: Buffer) => chunks.push(chunk))
-                .on('end', () => {
-                    const nativeRequestBody: string = Buffer.concat(chunks).toString();
-                    const httpSession = new HttpSession(nativeRequest, nativeResponse, nativeRequestBody);
-
-                    this.handleRequest(httpSession)
-                        .catch(() => httpSession.abort("Bad request.", 400));
-                });
-        });
-
-        this._server.on('clientError', (err, socket) => socket.end('HTTP/1.1 400 Bad Request\r\n\r\n'));
     }
 
     private handleRequest(httpSession: HttpSession): Promise<void> {
@@ -47,6 +32,28 @@ export class HttpServer {
 
     public listen(port: number): Promise<void> {
 
+        this._router.build();
+
+        this._server = http.createServer((nativeRequest, nativeResponse) => {
+
+            this._logger.debug("%s %s", nativeRequest.method, nativeRequest.url);
+
+            let chunks: Buffer[] = [];
+
+            nativeRequest
+                .on('data', (chunk: Buffer) => chunks.push(chunk))
+                .on('end', () => {
+                    const nativeRequestBody: string = Buffer.concat(chunks).toString();
+                    const httpSession = new HttpSession(nativeRequest, nativeResponse, nativeRequestBody);
+
+                    this.handleRequest(httpSession)
+                        .catch(error => {
+                            this._logger.error("%s", error.stack);
+                            httpSession.abort("Bad request.", 400)
+                        });
+                });
+        });
+
         return new Promise<void>((resolve, reject) => {
             const onError = error => {
                 this._server.removeListener('listening', onListening);
@@ -58,8 +65,7 @@ export class HttpServer {
                 resolve();
             };
 
-            this._router.build();
-
+            this._server.on('clientError', (err, socket) => socket.end('HTTP/1.1 400 Bad Request\r\n\r\n'));
             this._server.once('error', onError);
             this._server.once('listening', onListening);
             this._server.listen(port);
@@ -67,7 +73,12 @@ export class HttpServer {
     }
 
     public terminate(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>(resolve => {
+            if (!this._server) {
+                resolve();
+                return;
+            }
+
             this._server.once('close', () => resolve());
             this._server.close();
         });

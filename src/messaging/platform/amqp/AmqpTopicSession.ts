@@ -1,8 +1,8 @@
-import { Session, Destination, Producer, Consumer } from "../abstract";
-import { NativeSession, NativeQueue, Exchange } from "./common";
+import { Destination, Producer, Consumer } from "../abstract";
+import { NativeQueue, Exchange } from "./common";
 import { AmqpConsumer } from "./AmqpConsumer";
 import { AmqpProducer } from "./AmqpProducer";
-import {AmqpSession} from "./AmqpSession";
+import { AmqpSession } from "./AmqpSession";
 
 const topicExchangeType = "fanout";
 
@@ -27,6 +27,12 @@ export class AmqpTopicSession extends AmqpSession {
                 return nativeQueue;
             })
             .then((nativeQueue: NativeQueue) => new AmqpConsumer(this.nativeSession, nativeQueue.queue));
+    }
+
+    public createProducer(destination: Destination): Promise<Producer> {
+        return this
+            .ensureDestinationExists(destination)
+            .then(() => new AmqpProducer(this.nativeSession, destination, false));
     }
 }
 
