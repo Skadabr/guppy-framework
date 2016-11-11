@@ -25,6 +25,7 @@ export class MessagingBundle extends Bundle {
 
     public services(container: Container, config: ConfigState): void {
         container
+            .factory(ObserverRegistry, () => new ObserverRegistry(false))
             .factory(DefaultMessageHandlerFactory, () => new DefaultMessageHandlerFactory(
                 container.get(TopicConnectionFactory),
                 container.get(QueueConnectionFactory),
