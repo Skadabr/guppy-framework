@@ -6,16 +6,13 @@ import { AmqpQueueConnectionFactory } from "./AmqpQueueConnectionFactory";
 import { AmqpTopicConnectionFactory } from "./AmqpTopicConnectionFactory";
 import { QueueConnectionFactory, TopicConnectionFactory } from "../abstract/index";
 
+/** @internal */
 import * as amqplib from "amqplib";
 
 export class AmqpBundle extends Bundle {
 
     public name(): string {
         return "guppy.messaging.amqp";
-    }
-
-    public autoload(): string[] {
-        return [];
     }
 
     public config(config: Config): void {
@@ -31,12 +28,12 @@ export class AmqpBundle extends Bundle {
                 config.get("guppy.messaging.amqp.url"),
                 amqplib
             ))
-            .factory(AmqpQueueConnectionFactory, () => new AmqpQueueConnectionFactory(
-                container.get(AmqpConnectionFactory)
-            ))
-            .factory(AmqpTopicConnectionFactory, () => new AmqpTopicConnectionFactory(
-                container.get(AmqpConnectionFactory)
-            ))
+            .service(AmqpQueueConnectionFactory, [
+                AmqpConnectionFactory
+            ])
+            .service(AmqpTopicConnectionFactory, [
+                AmqpConnectionFactory
+            ])
             .factory(QueueConnectionFactory, () => container.get(AmqpQueueConnectionFactory))
             .factory(TopicConnectionFactory, () => container.get(AmqpTopicConnectionFactory));
     }

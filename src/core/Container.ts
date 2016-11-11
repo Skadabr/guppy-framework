@@ -7,6 +7,13 @@ export interface ClassConstructor<T> extends Function {
 
 export type Class<T> = ClassConstructor<T> | Function;
 
+export function create<T>(
+    targetClass: { new(...dependencies: any[]): T; },
+    dependencies?: any[]
+): T {
+    return new targetClass(...dependencies);
+}
+
 export class Container {
 
     private _services: Map<Class<any>, ServiceDefinition> = new Map();
@@ -15,32 +22,50 @@ export class Container {
         this.instance(Container, this);
     }
 
-    public factory(service: Function, serviceFactory: ServiceFactory) {
-        this._services.set(service, new ServiceDefinition(serviceFactory));
+    public factory<T>(targetClass: Class<T>, serviceFactory: ServiceFactory) {
+        this._services.set(targetClass, new ServiceDefinition(serviceFactory));
         return this;
     }
 
-    public instance(service: Function, instance: Object) {
-        this._services.set(service, new ServiceDefinition(() => instance));
+    public instance<T>(targetClass: Class<T>, instance: Object) {
+        this._services.set(targetClass, new ServiceDefinition(() => instance));
         return this;
     }
 
-    public get<T>(c: Class<T>): T {
+    public service<T>(targetClass: Class<T>, dependencies: Class<any>[]) {
+        this._services.set(
+            targetClass,
+            new ServiceDefinition(() => create(
+                targetClass as any,
+                dependencies.map(dependencyClass => this.get(dependencyClass))
 
-        if (!this._services.has(c)) {
-            throw new ServiceNotRegistered(c.name);
-        }
-
-        return this._services.get(c).instance<T>();
+            ))
+        );
+        return this;
     }
 
-    public extend<T>(c: Class<T>, decorator: ServiceDecorator<T>) {
+    public get<T>(targetClass: Class<T>): T {
 
-        if (!this._services.has(c)) {
-            throw new ServiceNotRegistered(c.name);
+        if (!this._services.has(targetClass)) {
+            if (targetClass.length > 0) {
+                throw new ServiceNotRegistered(targetClass.name);
+            }
+            this._services.set(targetClass, new ServiceDefinition(() => create(targetClass as any, [])));
         }
 
-        const serviceDefinition = this._services.get(c);
+        return this._services.get(targetClass).instance<T>();
+    }
+
+    public extend<T>(targetClass: Class<T>, decorator: ServiceDecorator<T>) {
+
+        if (!this._services.has(targetClass)) {
+            if (targetClass.length > 0) {
+                throw new ServiceNotRegistered(targetClass.name);
+            }
+            this._services.set(targetClass, new ServiceDefinition(() => create(targetClass as any, [])));
+        }
+
+        const serviceDefinition = this._services.get(targetClass);
 
         serviceDefinition.registerDecorator(decorator);
 

@@ -26,50 +26,39 @@ export class HttpBundle implements Bundle {
     config(config: Config) {
         config
             .section("guppy.http")
-                .setFromEnvironment("serverPort", "APP_PORT")
+                .setFromEnvironment("serverPort", "PORT")
             .end();
     }
 
     services(container: Container, config: ConfigState) {
         container
-            .factory(RouteRegistry, () => new RouteRegistry())
-            .factory(ErrorHandlerRegistry, () => new ErrorHandlerRegistry())
-            .factory(RouteBuilder, () => new RouteBuilder(
-                container.get(Container),
-                container.get(RouteRegistry),
-                container.get(MiddlewareRegistry)
+            .factory(RouteRegistry, () => new RouteRegistry(false))
+            .service(RouteBuilder, [
+                Container,
+                RouteRegistry,
+                MiddlewareRegistry
+            ])
+            .service(Router, [
+                RouteBuilder
+            ])
+            .service(HttpServer, [
+                Router,
+                Presenter,
+                ErrorHandlerRegistry
+            ])
+            .factory(HttpServerCommand, () => new HttpServerCommand(
+                container.get(HttpServer),
+                container.get(LoggerFactory).createLogger("http"),
+                config.has("guppy.http.serverPort")
+                    ? parseInt(<string> config.get("guppy.http.serverPort"))
+                    : null
             ))
-            .factory(Router, () => new DefaultRouter(
-                container.get(RouteBuilder)
-            ))
-            .factory(MiddlewareRegistry, () => new MiddlewareRegistry())
-            .factory(HttpServer, () => new HttpServer(
-                container.get(Router),
-                container.get(Presenter),
-                container.get(ErrorHandlerRegistry)
-            ))
-            .factory(
-                HttpServerCommand,
-                () => new HttpServerCommand(
-                    container.get(HttpServer),
-                    container.get(LoggerFactory).createLogger("http"),
-                    config.has("guppy.http.serverPort")
-                        ? parseInt(<string> config.get("guppy.http.serverPort"))
-                        : null
-                )
-            )
-            .factory(
-                HttpRoutesCommand,
-                () => new HttpRoutesCommand(
-                    container.get(RouteRegistry)
-                )
-            )
-            .extend(
-                CommandRegistry,
-                (commandRegistry: CommandRegistry) => {
-                    commandRegistry.register("http:server", HttpServerCommand);
-                    commandRegistry.register("http:routes", HttpRoutesCommand);
-                }
-            );
+            .service(HttpRoutesCommand, [
+                RouteRegistry
+            ])
+            .extend(CommandRegistry, (commandRegistry: CommandRegistry) => {
+                commandRegistry.register("http:serve", HttpServerCommand);
+                commandRegistry.register("http:routes", HttpRoutesCommand);
+            });
     }
 }

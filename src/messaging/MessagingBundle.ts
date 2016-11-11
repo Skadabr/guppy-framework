@@ -15,10 +15,6 @@ export class MessagingBundle extends Bundle {
         return "guppy.messaging";
     }
 
-    public autoload(): string[] {
-        return [];
-    }
-
     public config(config: Config): void {
         config
             .section("guppy.messaging")
@@ -45,12 +41,11 @@ export class MessagingBundle extends Bundle {
             .factory(PublisherFactory, () => container.get(
                 config.get("guppy.messaging.publisherFactoryClass") as Function
             ))
-            .factory(ObserverRegistry, () => new ObserverRegistry())
-            .factory(MessagingServeCommand, () => new MessagingServeCommand(
-                container,
-                container.get(ObserverRegistry),
-                container.get(MessageHandlerFactory)
-            ))
+            .service(MessagingServeCommand, [
+                Container,
+                ObserverRegistry,
+                MessageHandlerFactory
+            ])
             .extend(CommandRegistry, (commandRegistry: CommandRegistry) => {
                 commandRegistry.register("messaging:serve", MessagingServeCommand);
             });

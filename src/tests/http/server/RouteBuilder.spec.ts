@@ -18,6 +18,10 @@ describe("guppy.http.server.RouteBuilder", () => {
 
         class UserController {
 
+            constructor(someDependency: Number) {
+                
+            }
+
             @Get("/users")
             all(userId: number, userSlug: string) { }
         }

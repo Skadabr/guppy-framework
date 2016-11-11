@@ -21,24 +21,16 @@ export class ConsoleBundle implements Bundle {
 
     services(container: Container, config: ConfigState): void {
         container
-            .factory(
-                CommandRegistry, () => new CommandRegistry()
-            )
-            .factory(
-                HelpCommand,
-                () => new HelpCommand(VERSION, container.get(CommandRegistry))
-            )
-            .extend(
-                CommandRegistry,
-                (commandRegistry: CommandRegistry) => commandRegistry.register("help", HelpCommand)
-            )
-            .factory(
-                ConsoleWriter,
-                () => new DefaultConsoleWriter(process.stdout)
-            )
-            .factory(
-                ConsoleOutput,
-                () => new DefaultConsoleOutput(container.get(ConsoleWriter))
-            );
+            .factory(HelpCommand, () => new HelpCommand(
+                VERSION,
+                container.get(CommandRegistry)
+            ))
+            .extend(CommandRegistry, (commandRegistry: CommandRegistry) => {
+                commandRegistry.register("help", HelpCommand);
+            })
+            .factory(ConsoleWriter, () => new DefaultConsoleWriter(process.stdout))
+            .factory(ConsoleOutput, () => new DefaultConsoleOutput(
+                container.get(ConsoleWriter)
+            ));
     }
 }

@@ -38,7 +38,7 @@ describe("guppy.http.server.HttpBundle", () => {
         const configState = new ConfigState();
         const config = new DefaultConfig(configState);
 
-        process.env.APP_PORT = 4512;
+        process.env.PORT = 4512;
         httpBundle.config(config);
 
         assert.equal(configState.get("guppy.http.serverPort"), 4512);
@@ -67,8 +67,8 @@ describe("guppy.http.server.HttpBundle", () => {
         const commandRegistry: CommandRegistry = container.get(CommandRegistry);
         const allRegisteredCommands = commandRegistry.all();
 
-        assert.ok(allRegisteredCommands.hasOwnProperty("http:server"));
-        assert.equal(allRegisteredCommands["http:server"], HttpServerCommand);
+        assert.ok(allRegisteredCommands.hasOwnProperty("http:serve"));
+        assert.equal(allRegisteredCommands["http:serve"], HttpServerCommand);
         assert.ok(allRegisteredCommands.hasOwnProperty("http:routes"));
         assert.equal(allRegisteredCommands["http:routes"], HttpRoutesCommand);
     });
@@ -86,7 +86,7 @@ describe("guppy.http.server.HttpBundle", () => {
         }));
         container.instance(ConsoleOutput, mock<ConsoleOutput>());
 
-        process.env.APP_PORT = 2310;
+        process.env.PORT = 2310;
         httpBundle.config(config);
         httpBundle.services(container, configState);
 

@@ -1,6 +1,5 @@
 import assert = require("assert");
 
-import { ServiceNotRegistered } from "../../core/ServiceNotRegistered";
 import { Container } from "../../core/Container";
 
 describe("guppy.core.Container", () => {
@@ -12,7 +11,54 @@ describe("guppy.core.Container", () => {
 
         const value = container.get(Number);
          
-        assert.equal(1, value);
+        assert.equal(value, 1);
+    });
+
+    it("instantiates classes without arguments", () => {
+
+        class GreetingService {
+            message(name: string) {
+                return `Hello, ${name}!`;
+            }
+        }
+
+        const container = new Container();
+
+        const greetingService: GreetingService = container.get(GreetingService);
+
+        assert.equal(greetingService.message("Alex"), "Hello, Alex!");
+    });
+
+    it("registers a service", () => {
+
+        class GreetingService {
+            message(name: string) {
+                return `Hello, ${name}!`;
+            }
+        }
+
+        class UserController {
+
+            constructor(
+                private greetingService: GreetingService
+            ) {
+            }
+
+            hello(name: string): string {
+                return this.greetingService.message(name);
+            }
+        }
+
+        const container = new Container();
+
+        container
+            .service(UserController, [
+                GreetingService
+            ]);
+
+        const userController: UserController = container.get(UserController);
+
+        assert.equal(userController.hello("Alex"), "Hello, Alex!");
     });
 
     it("returns a lazy-loaded instance", () => {
