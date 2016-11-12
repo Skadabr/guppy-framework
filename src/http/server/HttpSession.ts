@@ -36,12 +36,17 @@ export class HttpSession {
 
         this._nativeResponse.statusCode = response.statusCode();
 
-        if (response.streamWriter !== void 0) {
+        if (response.streamWriter) {
             response.streamWriter(this._nativeResponse);
         } else {
-            if (response.statusCode() !== ResponseStatus.NoContent && this._nativeRequest.method !== 'HEAD') {
+            const content = response.content();
+
+            if (response.statusCode() !== ResponseStatus.NoContent
+                && this._nativeRequest.method !== 'HEAD'
+                && content != null
+            ) {
                 const serializedContent: string = JSON.stringify(
-                    presenter.present(response.content())
+                    presenter.present(content)
                 );
 
                 this._nativeResponse.setHeader('Content-Length', `${serializedContent.length}`);

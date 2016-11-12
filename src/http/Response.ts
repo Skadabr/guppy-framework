@@ -55,6 +55,14 @@ export class Response {
         );
     }
 
+    public static redirect(url: string, headers?: Headers): Response {
+        return Response.json(
+            ResponseStatus.Found,
+            { location: url },
+            Object.assign({ "Location": url }, headers)
+        );
+    }
+
     public static notFound(content: any, headers?: Headers): Response {
         return Response.json(
             ResponseStatus.NotFound,
