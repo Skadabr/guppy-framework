@@ -36,7 +36,6 @@ export class UserController {
 
 ## Roadmap
 
-* Multithreaded HTTP server
 * HTTP Client (for microservice communication)
 * DBAL supporting
 
