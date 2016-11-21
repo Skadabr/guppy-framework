@@ -25,10 +25,20 @@ describe("guppy.http.server.HttpServer", () => {
         httpServer = new HttpServer(
             new StubRouter(),
             new RootPresenter(),
-            new ErrorHandlerRegistry(),
+            new ErrorHandlerRegistry(
+                mock<Logger>({
+                    error(message: string, ...data: any[]) {
+                        errorBuffer.push(`${message} ${JSON.stringify(data)}`);
+                    }
+                })
+            ),
             mock<Logger>({
                 debug(message: string, ...data: any[]) {
                     debugBuffer.push(`${message} ${JSON.stringify(data)}`);
+                },
+
+                error(message: string, ...data: any[]) {
+                    errorBuffer.push(`${message} ${JSON.stringify(data)}`);
                 }
             })
         );
@@ -85,8 +95,8 @@ describe("guppy.http.server.HttpServer", () => {
 
             assert.equal(response.status, 500);
             assert.deepEqual(responseContent, {
-                "developerMessage": "Simulated error",
-                "userMessage": "Internal Server Error"
+                "debugMessage": "Simulated error",
+                "message": "Internal Server Error"
             });
 
             assert.deepEqual(debugBuffer, [
@@ -103,7 +113,9 @@ describe("guppy.http.server.HttpServer", () => {
         const secondServer = new HttpServer(
             new StubRouter(),
             new RootPresenter(),
-            new ErrorHandlerRegistry(),
+            new ErrorHandlerRegistry(
+                mock<Logger>()
+            ),
             mock<Logger>()
         );
 
@@ -122,7 +134,9 @@ describe("guppy.http.server.HttpServer", () => {
         return new HttpServer(
             new StubRouter(),
             new RootPresenter(),
-            new ErrorHandlerRegistry(),
+            new ErrorHandlerRegistry(
+                mock<Logger>()
+            ),
             mock<Logger>()
         ).terminate();
     });
@@ -137,7 +151,9 @@ describe("guppy.http.server.HttpServer", () => {
                 }
             }),
             mock<Presenter>(),
-            new ErrorHandlerRegistry(),
+            new ErrorHandlerRegistry(
+                mock<Logger>()
+            ),
             mock<Logger>({
                 debug(message: string, ...data: any[]) {
                     debugBuffer.push(`${message} ${JSON.stringify(data)}`);
@@ -170,7 +186,9 @@ describe("guppy.http.server.HttpServer", () => {
                 build: () => Promise.resolve()
             }),
             mock<Presenter>(),
-            new ErrorHandlerRegistry(),
+            new ErrorHandlerRegistry(
+                mock<Logger>()
+            ),
             mock<Logger>()
         );
 

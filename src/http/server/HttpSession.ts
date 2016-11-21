@@ -40,14 +40,25 @@ export class HttpSession {
             response.streamWriter(this._nativeResponse);
         } else {
             const content = response.content();
+            const contentType = headers["Content-Type"];
 
             if (response.statusCode() !== ResponseStatus.NoContent
                 && this._nativeRequest.method !== 'HEAD'
                 && content != null
             ) {
-                const serializedContent: string = JSON.stringify(
-                    presenter.present(content)
-                );
+                let serializedContent: string;
+
+                switch (contentType) {
+                    case "text/html":
+                        serializedContent = content.toString();
+                        break;
+
+                    default:
+                        serializedContent = JSON.stringify(
+                            presenter.present(content)
+                        );
+                        break;
+                }
 
                 this._nativeResponse.setHeader('Content-Length', `${serializedContent.length}`);
                 this._nativeResponse.write(serializedContent);

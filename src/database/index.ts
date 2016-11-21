@@ -3,7 +3,7 @@ export type Transactional = () => void | Promise<void>;
 export abstract class ResultStatement {
     public abstract fetch(): Promise<Object>;
     public abstract fetchAll(): Promise<Object[]>;
-    public abstract fetchColumn(columnIndex?: number): Promise<string | number | boolean | null>;
+    public abstract fetchColumn(column?: string | number): Promise<string|number|boolean|null>
 }
 
 export abstract class Statement extends ResultStatement {
@@ -24,4 +24,11 @@ export abstract class Connection {
     public abstract beginTransaction(): Promise<void>;
     public abstract commit(): Promise<void>;
     public abstract rollback(): Promise<void>;
+}
+
+export abstract class ConnectionError extends Error {
+
+    public constructor(message) {
+        super(message);
+    }
 }

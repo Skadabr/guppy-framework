@@ -1,6 +1,8 @@
 {
   "name": "guppy-framework",
-  "dependencies": {},
+  "dependencies": {
+    "mysql": "registry:npm/mysql#2.11.1+20161114232222"
+  },
   "globalDependencies": {
     "assert": "registry:dt/assert#0.0.0+20160317120654",
     "chai": "registry:dt/chai#3.4.0+20160601211834",

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "unit": "tsc && mocha --reporter dot --recursive dist/tests",
+    "unit": "tsc && mocha --recursive dist/tests",
     "lint": "tslint ./src/**/*.ts",
     "test": "npm run unit && npm run lint",
     "coverage": "tsc && istanbul --include-all-sources cover _mocha -- --recursive ./dist/tests",
@@ -36,6 +36,7 @@
     "easy-table": "^1.0.0",
     "glob": "^7.0.6",
     "log4js": "^1.0.1",
+    "mysql": "^2.12.0",
     "reflect-metadata": "^0.1.8"
   }
 }

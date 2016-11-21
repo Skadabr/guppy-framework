@@ -25,7 +25,9 @@ describe("guppy.console.ConsoleApplication", () => {
             mock<Bundle>({
                 autoload: () => [],
                 config: () => {},
-                services: (container: Container) => container.instance(ConsoleWriter, consoleWriter)
+                developmentConfig: () => {},
+                services: (container: Container) => container.instance(ConsoleWriter, consoleWriter),
+                developmentServices: () => {}
             })
         ]);
 

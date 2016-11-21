@@ -14,8 +14,24 @@ export class BundleLoader {
     async load(bundles: Bundle[]) {
         const configState = new ConfigState();
         const config = new DefaultConfig(configState);
+        const environment: string = process.env.NODE_ENV || "development";
 
         for (const bundle of bundles) bundle.config(config);
+
+        switch (environment) {
+            case "production":
+                for (const bundle of bundles) bundle.productionConfig(config);
+                break;
+
+            case "testing":
+                for (const bundle of bundles) bundle.testingConfig(config);
+                break;
+
+            default:
+            case "development":
+                for (const bundle of bundles) bundle.developmentConfig(config);
+                break;
+        }
 
         for (const bundle of bundles) {
             await Promise.all(
@@ -25,6 +41,21 @@ export class BundleLoader {
             );
 
             bundle.services(this._container, configState);
+
+            switch (environment) {
+                case "production":
+                    for (const bundle of bundles) bundle.productionServices(this._container, configState);
+                    break;
+
+                case "testing":
+                    for (const bundle of bundles) bundle.testingServices(this._container, configState);
+                    break;
+
+                default:
+                case "development":
+                    for (const bundle of bundles) bundle.developmentServices(this._container, configState);
+                    break;
+            }
         }
     }
 

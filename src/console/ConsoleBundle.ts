@@ -6,7 +6,7 @@ import { VERSION } from "..";
 import { CommandRegistry, ConsoleWriter, ConsoleOutput, DefaultConsoleWriter, DefaultConsoleOutput } from ".";
 import { HelpCommand } from "./commands/HelpCommand";
 
-export class ConsoleBundle implements Bundle {
+export class ConsoleBundle extends Bundle {
 
     name(): string {
         return "guppy.console";

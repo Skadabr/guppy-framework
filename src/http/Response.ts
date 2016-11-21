@@ -10,14 +10,20 @@ export interface ResponseStream {
 
 export class Response {
 
-    public constructor(
-        private _content: any,
-        private _statusCode: number,
-        private _headers: Headers,
-        public streamWriter?: ResponseStreamWriter
-    ) {
-        if (this._statusCode === void 0) this._statusCode = ResponseStatus.Ok;
+    private _content: any = null;
+    private _statusCode: number = ResponseStatus.Ok;
+    private _headers: Headers = {};
 
+    public streamWriter: ResponseStreamWriter;
+
+    public constructor(
+        content?: any,
+        statusCode?: number,
+        headers?: Headers
+    ) {
+        if (content !== void 0) this.setContent(content);
+        if (headers !== void 0) this.setHeaders(headers);
+        if (statusCode !== void 0) this.setStatusCode(statusCode);
     }
 
     public content(): any {
@@ -29,12 +35,31 @@ export class Response {
         return this;
     }
 
+    public setHeaders(headers: Headers) {
+        this._headers = headers;
+    }
+
+    public setHeader(header: string, value: string | number): Response {
+        this._headers[header] = value.toString();
+        return this;
+    }
+
     public headers(): Headers {
         return this._headers;
     }
 
     public statusCode(): number {
         return this._statusCode;
+    }
+
+    public setStatusCode(statusCode: number): Response {
+        this._statusCode = statusCode;
+        return this;
+    }
+
+    public stream(streamWriter: ResponseStreamWriter): Response {
+        this.streamWriter = streamWriter;
+        return this;
     }
 
     public static json(statusCode: number, content: any, headers?: Headers): Response {
@@ -45,6 +70,10 @@ export class Response {
             statusCode,
             Object.assign({ "Content-Type": "application/json" }, headers)
         );
+    }
+
+    public static contentType(contentType: string): Response {
+        return new Response().setHeader("Content-Type", contentType);
     }
 
     public static ok(content: any, headers?: Headers): Response {
@@ -80,6 +109,6 @@ export class Response {
     }
 
     public static stream(streamWriter: ResponseStreamWriter, headers?: Headers, statusCode?: number): Response {
-        return new Response(null, statusCode, headers, streamWriter);
+        return new Response(null, statusCode, headers).stream(streamWriter);
     }
 }

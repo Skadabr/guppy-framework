@@ -8,7 +8,7 @@ import { LoggerFactory, Logger, Log4jsLoggerFactory, LogLevel } from "./logger";
 /** @internal */
 import * as log4js from "log4js";
 
-export class CoreBundle implements Bundle {
+export class CoreBundle extends Bundle {
 
     public name(): string {
         return "guppy.core";
@@ -28,6 +28,14 @@ export class CoreBundle implements Bundle {
                     { type: "console" },
                     { type: "file", filename: "logs/guppy.log" },
                 ])
+            .end();
+    }
+
+    public productionConfig(config: Config): void {
+
+        config
+            .section("guppy.core.logger")
+                .set("level", "INFO")
             .end();
     }
 

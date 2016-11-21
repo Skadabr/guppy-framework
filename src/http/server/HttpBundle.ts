@@ -9,9 +9,9 @@ import { Router } from ".";
 import { MiddlewareRegistry } from "./MiddlewareRegistry";
 import { RouteBuilder } from "./RouteBuilder";
 import { ErrorHandlerRegistry } from "./ErrorHandlerRegistry";
-import {DefaultRouter} from "./DefaultRouter";
+import { DefaultRouter } from "./DefaultRouter";
 
-export class HttpBundle implements Bundle {
+export class HttpBundle extends Bundle {
 
     name(): string {
         return "guppy.http";
@@ -39,6 +39,9 @@ export class HttpBundle implements Bundle {
             .factory(Router, () => new DefaultRouter(
                 container.get(RouteBuilder)
             ))
+            .service(ErrorHandlerRegistry, [
+                Logger
+            ])
             .service(HttpServer, [
                 Router,
                 Presenter,

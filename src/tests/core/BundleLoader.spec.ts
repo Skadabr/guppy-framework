@@ -22,7 +22,9 @@ describe("guppy.core.BundleLoader", () => {
             mock<Bundle>({
                 autoload: () => [`${__dirname}/_bundles`],
                 config: () => {},
-                services: () => {}
+                developmentConfig: () => {},
+                services: () => {},
+                developmentServices: () => {},
             })
         ]);
     });
@@ -39,6 +41,7 @@ describe("guppy.core.BundleLoader", () => {
             .load([
                 mock<Bundle>({
                     autoload: () => [`${__dirname}/_bundles`],
+                    developmentConfig: () => {},
                     config: () => {},
                     services: () => {}
                 })

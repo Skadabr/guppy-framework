@@ -26,7 +26,7 @@ export class HttpServeCommand implements Command {
         return this._httpServer
             .listen(serverPort)
             .then(() => {
-                this._logger.info(`Server has been started on ${serverPort} port.`)
+                this._logger.info(`Server has been started on ${serverPort} port.`);
             });
     }
 

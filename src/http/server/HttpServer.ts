@@ -26,8 +26,12 @@ export class HttpServer {
                 .then(resolvedRoute => resolvedRoute.handler(
                     httpSession.createRequest(resolvedRoute.routeParameters)
                 ))
+                .then(response => {
+                    if (response == null) throw new Error("Action must return any Response.");
+                    return response;
+                })
                 .catch(error => this._errorHandlerRegistry.handle(error))
-                .then((response:Response) => httpSession.sendResponse(response, this._presenter));
+                .then(response => httpSession.sendResponse(response, this._presenter));
     }
 
     public listen(port: number): Promise<void> {
