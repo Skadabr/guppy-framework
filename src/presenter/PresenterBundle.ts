@@ -5,12 +5,11 @@ import { RootPresenter } from "./RootPresenter";
 
 export class PresenterBundle extends Bundle {
 
-    name(): string {
+    public name(): string {
         return "guppy.presenter";
     }
 
-    services(container: Container, config: ConfigState): void {
-        container
-            .factory(Presenter, () => new RootPresenter());
+    public services(container: Container, config: ConfigState): void {
+        container.bind(Presenter, RootPresenter);
     }
 }

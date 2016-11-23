@@ -39,7 +39,6 @@ describe("guppy.console.CommandRunner", () => {
             execute = () => done();
         }
 
-        container.factory(HelpCommand, () => new HelpCommand());
         commandRegistry.register("help", HelpCommand);
     
         const commandRunner = new CommandRunner(container, commandRegistry, consoleOutput);

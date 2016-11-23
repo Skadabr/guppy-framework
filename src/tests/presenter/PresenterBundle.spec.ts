@@ -65,10 +65,6 @@ describe("guppy.presenter.PresenterBundle", () => {
         presenterBundle.services(container, configState);
 
         container
-            .factory(
-                UserPresenter,
-                () => new UserPresenter()
-            )
             .extend(
                 Presenter,
                 (presenter: RootPresenter) => presenter.register(

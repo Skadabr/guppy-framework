@@ -41,15 +41,15 @@ export class CoreBundle extends Bundle {
 
     public services(container: Container, config: ConfigState): void {
         container
-            .factory(Log4jsLoggerFactory, () => new Log4jsLoggerFactory(
+            .service(Log4jsLoggerFactory, () => new Log4jsLoggerFactory(
                 log4js,
                 <LogLevel> config.get("guppy.core.logger.level"),
                 <any> config.get("guppy.core.logger.appenders")
             ))
-            .factory(LoggerFactory, () => container.get(
+            .service(LoggerFactory, () => container.get(
                 <any> config.get("guppy.core.logger.factoryClass")
             ))
-            .factory(Logger, () => {
+            .service(Logger, () => {
                 return container.get(LoggerFactory).createLogger("default");
             });
     }

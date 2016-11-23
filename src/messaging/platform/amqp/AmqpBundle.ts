@@ -24,7 +24,7 @@ export class AmqpBundle extends Bundle {
 
     public services(container: Container, config: ConfigState): void {
         container
-            .factory(AmqpConnectionFactory, () => new AmqpConnectionFactory(
+            .service(AmqpConnectionFactory, () => new AmqpConnectionFactory(
                 config.get("guppy.messaging.amqp.url"),
                 amqplib
             ))
@@ -34,7 +34,7 @@ export class AmqpBundle extends Bundle {
             .service(AmqpTopicConnectionFactory, [
                 AmqpConnectionFactory
             ])
-            .factory(QueueConnectionFactory, () => container.get(AmqpQueueConnectionFactory))
-            .factory(TopicConnectionFactory, () => container.get(AmqpTopicConnectionFactory));
+            .service(QueueConnectionFactory, () => container.get(AmqpQueueConnectionFactory))
+            .service(TopicConnectionFactory, () => container.get(AmqpTopicConnectionFactory));
     }
 }

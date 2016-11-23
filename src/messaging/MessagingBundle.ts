@@ -24,22 +24,23 @@ export class MessagingBundle extends Bundle {
     }
 
     public services(container: Container, config: ConfigState): void {
+
         container
-            .factory(ObserverRegistry, () => new ObserverRegistry(false))
-            .factory(DefaultMessageHandlerFactory, () => new DefaultMessageHandlerFactory(
+            .service(ObserverRegistry, () => new ObserverRegistry(false))
+            .service(DefaultMessageHandlerFactory, () => new DefaultMessageHandlerFactory(
                 container.get(TopicConnectionFactory),
                 container.get(QueueConnectionFactory),
                 container.get(LoggerFactory).createLogger("messaging")
             ))
-            .factory(DefaultPublisherFactory, () => new DefaultPublisherFactory(
+            .service(DefaultPublisherFactory, () => new DefaultPublisherFactory(
                 container.get(TopicConnectionFactory),
                 container.get(QueueConnectionFactory),
                 container.get(LoggerFactory).createLogger("messaging")
             ))
-            .factory(MessageHandlerFactory, () => container.get(
+            .service(MessageHandlerFactory, () => container.get(
                 config.get("guppy.messaging.messageHandlerFactoryClass") as Function
             ))
-            .factory(PublisherFactory, () => container.get(
+            .service(PublisherFactory, () => container.get(
                 config.get("guppy.messaging.publisherFactoryClass") as Function
             ))
             .service(MessagingServeCommand, [
@@ -47,8 +48,8 @@ export class MessagingBundle extends Bundle {
                 ObserverRegistry,
                 MessageHandlerFactory
             ])
-            .extend(CommandRegistry, (commandRegistry: CommandRegistry) => {
-                commandRegistry.register("messaging:serve", MessagingServeCommand);
+            .extend(CommandRegistry, (registry: CommandRegistry) => {
+                registry.register("messaging:serve", MessagingServeCommand);
             });
     }
 }

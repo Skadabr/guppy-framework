@@ -52,8 +52,6 @@ describe("guppy.http.server.RouteBuilder", () => {
         const middlewareRegistry: MiddlewareRegistry = new MiddlewareRegistry();
         const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry);
 
-        container.factory(UserController, () => new UserController());
-
         assert.throws(
             () => routeBuilder.build(),
             /All arguments types of UserController#all must be declared./
@@ -86,8 +84,7 @@ describe("guppy.http.server.RouteBuilder", () => {
         const middlewareRegistry: MiddlewareRegistry = new MiddlewareRegistry();
         const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry);
 
-        container.instance(RouteRegistry, routeRegistry);
-        container.factory(UserController, () => new UserController());
+        container.service(RouteRegistry, routeRegistry);
 
         const routeHandlers: RouteHandler[] = routeBuilder.build();
 
@@ -140,8 +137,7 @@ describe("guppy.http.server.RouteBuilder", () => {
         const middlewareRegistry: MiddlewareRegistry = new MiddlewareRegistry();
         const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry);
 
-        container.instance(RouteRegistry, routeRegistry);
-        container.factory(UserController, () => new UserController());
+        container.service(RouteRegistry, routeRegistry);
 
         middlewareRegistry.register({
             handle: (request: Request, next: RouteAction): Promise<Response> => {

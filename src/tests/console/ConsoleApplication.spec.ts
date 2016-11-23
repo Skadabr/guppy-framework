@@ -26,7 +26,7 @@ describe("guppy.console.ConsoleApplication", () => {
                 autoload: () => [],
                 config: () => {},
                 developmentConfig: () => {},
-                services: (container: Container) => container.instance(ConsoleWriter, consoleWriter),
+                services: (container: Container) => container.service(ConsoleWriter, consoleWriter),
                 developmentServices: () => {}
             })
         ]);

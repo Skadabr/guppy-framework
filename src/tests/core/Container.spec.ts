@@ -7,7 +7,7 @@ describe("guppy.core.Container", () => {
     it("returns registered instances", () => {
         const container = new Container();
 
-        container.instance(Number, 1);
+        container.service(Number, 1);
 
         const value = container.get(Number);
          
@@ -61,12 +61,37 @@ describe("guppy.core.Container", () => {
         assert.equal(userController.hello("Alex"), "Hello, Alex!");
     });
 
+    it("registers a factory", () => {
+
+        class User {
+            public constructor(public id: number) { }
+        }
+
+        class UserFactory {
+            public counter: number = 0;
+            public create() {
+                return new User(++this.counter);
+            }
+        }
+
+        const container = new Container();
+        const userFactory = new UserFactory();
+
+        container.factory(User, () => userFactory.create());
+
+        container.get(User);
+        container.get(User);
+        container.get(User);
+
+        assert.equal(userFactory.counter, 3);
+    });
+
     it("returns a lazy-loaded instance", () => {
         const container = new Container();
 
         let counter = 2;
 
-        container.factory(Number, () => counter = 3);
+        container.service(Number, () => counter = 3);
 
         assert.equal(2, counter);
         assert.equal(3, container.get(Number));
@@ -103,9 +128,9 @@ describe("guppy.core.Container", () => {
         const container = new Container();
 
         container
-            .factory(
+            .service(
                 FirstService,
-                () => new FirstService()
+                () => new FirstService(0)
             )
             .extend(
                 FirstService,

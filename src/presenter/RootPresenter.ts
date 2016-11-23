@@ -10,34 +10,40 @@ export class RootPresenter extends Presenter {
 
     public present(data: any): any {
 
-        if (typeof data["constructor"] !== "function") return data;
+        if (data == null) return null;
 
-        if (data.constructor.name === "Array") {
-            const result = [];
+        let result;
 
-            for (const elementIndex in data) {
-                result.push(
-                    this.present(data[elementIndex])
-                );
-            }
+        switch (data.constructor.name) {
 
-            return result;
+            case "Array":
+                result = [];
+
+                for (const elementIndex in data) {
+                    result.push(
+                        this.present(data[elementIndex])
+                    );
+                }
+
+                break;
+
+            case "Object":
+                result = {};
+
+                for (const elementIndex in data) {
+                    result[elementIndex] = this.present(data[elementIndex]);
+                }
+
+                break;
+
+            default:
+                result = this._presenters.has(data.constructor)
+                    ? this._presenters.get(data.constructor).present(data)
+                    : data;
+
+                break;
         }
 
-        if (data.constructor.name === "Object") {
-            const result = {};
-
-            for (const elementIndex in data) {
-                result[elementIndex] = this.present(data[elementIndex]);
-            }
-
-            return result;
-        }
-
-        if (this._presenters.has(data.constructor)) {
-            return this._presenters.get(data.constructor).present(data);
-        }
-
-        return data;
+        return result;
     }
 }

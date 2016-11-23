@@ -21,28 +21,44 @@ export class Container {
     private _services: Map<Class<any>, ServiceDefinition> = new Map();
 
     public constructor() {
-        this.instance(Container, this);
+        this.service(Container, this);
+    }
+
+    public bind<T>(abstractClass: Class<T>, implementation: Class<any>): Container {
+        this._services.set(
+            abstractClass,
+            new ServiceDefinition(() => this.get(implementation))
+        );
+        return this;
     }
 
     public factory<T>(targetClass: Class<T>, serviceFactory: ServiceFactory) {
-        this._services.set(targetClass, new ServiceDefinition(serviceFactory));
+        this._services.set(targetClass, new ServiceDefinition(serviceFactory, true));
         return this;
     }
 
-    public instance<T>(targetClass: Class<T>, instance: Object) {
-        this._services.set(targetClass, new ServiceDefinition(() => instance));
-        return this;
-    }
+    public service<T>(targetClass: Class<T>, objectProvider: ServiceFactory | Object | Class<any>[]) {
 
-    public service<T>(targetClass: Class<T>, dependencies: Class<any>[]) {
-        this._services.set(
-            targetClass,
-            new ServiceDefinition(() => create(
-                targetClass as any,
-                dependencies.map(dependencyClass => this.get(dependencyClass))
+        if (objectProvider instanceof Function) {
+            this._services.set(targetClass, new ServiceDefinition(objectProvider as ServiceFactory));
 
-            ))
-        );
+            return this;
+        }
+
+        if (objectProvider instanceof Array) {
+            this._services.set(
+                targetClass,
+                new ServiceDefinition(() => create(
+                    targetClass as any,
+                    (objectProvider as Class<any>[]).map(dependencyClass => this.get(dependencyClass))
+                ))
+            );
+
+            return this;
+        }
+
+        this._services.set(targetClass, new ServiceDefinition(() => objectProvider as Object));
+
         return this;
     }
 

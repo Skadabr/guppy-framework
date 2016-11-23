@@ -36,7 +36,7 @@ describe("guppy.validation.ValidationBundle", () => {
         const configState = new ConfigState();
         const container = new Container();
 
-        container.instance(MiddlewareRegistry, new MiddlewareRegistry());
+        container.service(MiddlewareRegistry, new MiddlewareRegistry());
 
         validationBundle.services(container, configState);
 

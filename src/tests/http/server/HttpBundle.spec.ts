@@ -48,12 +48,13 @@ describe("guppy.http.server.HttpBundle", () => {
         const configState = new ConfigState();
         const container = new Container();
 
-        container.instance(CommandRegistry, new CommandRegistry());
-        container.instance(Presenter, new RootPresenter());
-        container.instance(LoggerFactory, mock<LoggerFactory>({
-            createLogger: (loggerName: string) => mock<Logger>()
-        }));
-        container.instance(ConsoleOutput, mock<ConsoleOutput>());
+        container
+            .service(CommandRegistry, new CommandRegistry())
+            .service(Presenter, new RootPresenter())
+            .service(LoggerFactory, mock<LoggerFactory>({
+                createLogger: (loggerName: string) => mock<Logger>()
+            }))
+            .service(ConsoleOutput, mock<ConsoleOutput>());
 
         httpBundle.services(container, configState);
 
@@ -79,12 +80,13 @@ describe("guppy.http.server.HttpBundle", () => {
         const container = new Container();
         const commandRegistry = new CommandRegistry();
 
-        container.instance(CommandRegistry, commandRegistry);
-        container.instance(Presenter, new RootPresenter());
-        container.instance(LoggerFactory, mock<LoggerFactory>({
-            createLogger: (loggerName: string) => mock<Logger>()
-        }));
-        container.instance(ConsoleOutput, mock<ConsoleOutput>());
+        container
+            .service(CommandRegistry, commandRegistry)
+            .service(Presenter, new RootPresenter())
+            .service(LoggerFactory, mock<LoggerFactory>({
+                createLogger: (loggerName: string) => mock<Logger>()
+            }))
+            .service(ConsoleOutput, mock<ConsoleOutput>());
 
         process.env.PORT = 2310;
         httpBundle.config(config);

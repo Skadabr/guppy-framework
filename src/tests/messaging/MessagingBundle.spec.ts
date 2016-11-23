@@ -27,6 +27,7 @@ describe("guppy.messaging.MessagingBundle", () => {
     });
 
     it("configures an application", () => {
+
         const subject = new MessagingBundle();
         const configState = new ConfigState();
         const config = new DefaultConfig(configState);
@@ -51,7 +52,7 @@ describe("guppy.messaging.MessagingBundle", () => {
         const config = new DefaultConfig(configState);
         const container = new Container();
 
-        container.instance(
+        container.service(
             LoggerFactory,
             mock<LoggerFactory>({
                 createLogger(loggerName: string) {

@@ -30,13 +30,13 @@ export class HttpBundle extends Bundle {
 
     services(container: Container, config: ConfigState) {
         container
-            .factory(RouteRegistry, () => new RouteRegistry(false))
+            .service(RouteRegistry, () => new RouteRegistry(false))
             .service(RouteBuilder, [
                 Container,
                 RouteRegistry,
                 MiddlewareRegistry
             ])
-            .factory(Router, () => new DefaultRouter(
+            .service(Router, () => new DefaultRouter(
                 container.get(RouteBuilder)
             ))
             .service(ErrorHandlerRegistry, [
@@ -48,7 +48,7 @@ export class HttpBundle extends Bundle {
                 ErrorHandlerRegistry,
                 Logger
             ])
-            .factory(HttpServeCommand, () => new HttpServeCommand(
+            .service(HttpServeCommand, () => new HttpServeCommand(
                 container.get(HttpServer),
                 container.get(LoggerFactory).createLogger("http"),
                 config.has("guppy.http.serverPort")

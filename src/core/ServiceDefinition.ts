@@ -7,18 +7,25 @@ export class ServiceDefinition {
     private _instance: Object | null = null;
     private _decorators: ServiceDecorator<any>[] = [];
 
-    public constructor(private _factory: ServiceFactory) {
+    public constructor(
+        private _objectProvider: ServiceFactory,
+        private _isFactory?: boolean
+    ) {
+        if (this._isFactory === void 0) this._isFactory = false;
     }
 
     public instance<T>(): T {
-        if (this._instance == null) {
 
-            let instance = this._factory();
+        if (this._isFactory || this._instance == null) {
 
-            let result;
+            let instance = this._objectProvider();
+            let instanceClass = instance.constructor;
+
             for (const decorate of this._decorators) {
-                result = decorate(instance);
-                if (result instanceof instance.constructor) instance = result;
+                let result = decorate(instance);
+                if (result instanceof instanceClass) {
+                    instance = result;
+                }
             }
 
             this._instance = instance;
