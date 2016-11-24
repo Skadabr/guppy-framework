@@ -1,3 +1,4 @@
+export * from "./ArgumentFetcherRegistry";
 export * from "./Router";
 export * from "./DefaultRouter";
 export * from "./MiddlewareRegistry";

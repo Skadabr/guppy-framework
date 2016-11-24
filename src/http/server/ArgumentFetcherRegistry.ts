@@ -30,4 +30,9 @@ export class ArgumentFetcherRegistry {
     public get<T>(argumentType: Class<T>): ArgumentFetcher<T> | null {
         return this.fetchers.get(argumentType);
     }
+
+    public register<T>(argumentType: Class<T>, argumentFetcher: ArgumentFetcher<T>): ArgumentFetcherRegistry {
+        this.fetchers.set(argumentType, argumentFetcher);
+        return this;
+    }
 }
