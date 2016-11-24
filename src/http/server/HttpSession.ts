@@ -60,7 +60,7 @@ export class HttpSession {
                         break;
                 }
 
-                this._nativeResponse.setHeader('Content-Length', `${serializedContent.length}`);
+                this._nativeResponse.setHeader('Content-Length', Buffer.byteLength(serializedContent).toString());
                 this._nativeResponse.write(serializedContent);
             }
 
