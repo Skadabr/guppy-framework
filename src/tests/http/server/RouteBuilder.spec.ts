@@ -3,8 +3,9 @@ import assert = require("assert");
 import { Container } from "../../../core";
 import { Path, Get, Request, Response } from "../../../http";
 import { RouteBuilder, RouteHandler, RouteRegistry, MiddlewareRegistry } from "../../../http/server";
-import {IncomingMessage} from "http";
-import {RouteAction} from "../../../http/server/Router";
+import { IncomingMessage } from "http";
+import { RouteAction } from "../../../http/server/Router";
+import { ArgumentFetcherRegistry } from "../../../http/server/ArgumentFetcherRegistry";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -29,7 +30,8 @@ describe("guppy.http.server.RouteBuilder", () => {
         const container: Container = new Container();
         const routeRegistry: RouteRegistry = new RouteRegistry();
         const middlewareRegistry: MiddlewareRegistry = new MiddlewareRegistry();
-        const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry);
+        const argumentFetcherRegistry: ArgumentFetcherRegistry = new ArgumentFetcherRegistry();
+        const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry, argumentFetcherRegistry);
 
         assert.throws(
             () => routeBuilder.build(),
@@ -50,7 +52,8 @@ describe("guppy.http.server.RouteBuilder", () => {
         const container: Container = new Container();
         const routeRegistry: RouteRegistry = new RouteRegistry();
         const middlewareRegistry: MiddlewareRegistry = new MiddlewareRegistry();
-        const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry);
+        const argumentFetcherRegistry: ArgumentFetcherRegistry = new ArgumentFetcherRegistry();
+        const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry, argumentFetcherRegistry);
 
         assert.throws(
             () => routeBuilder.build(),
@@ -82,7 +85,8 @@ describe("guppy.http.server.RouteBuilder", () => {
         const container: Container = new Container();
         const routeRegistry: RouteRegistry = new RouteRegistry();
         const middlewareRegistry: MiddlewareRegistry = new MiddlewareRegistry();
-        const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry);
+        const argumentFetcherRegistry: ArgumentFetcherRegistry = new ArgumentFetcherRegistry();
+        const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry, argumentFetcherRegistry);
 
         container.service(RouteRegistry, routeRegistry);
 
@@ -135,7 +139,8 @@ describe("guppy.http.server.RouteBuilder", () => {
         const container: Container = new Container();
         const routeRegistry: RouteRegistry = new RouteRegistry();
         const middlewareRegistry: MiddlewareRegistry = new MiddlewareRegistry();
-        const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry);
+        const argumentFetcherRegistry: ArgumentFetcherRegistry = new ArgumentFetcherRegistry();
+        const routeBuilder: RouteBuilder = new RouteBuilder(container, routeRegistry, middlewareRegistry, argumentFetcherRegistry);
 
         container.service(RouteRegistry, routeRegistry);
 

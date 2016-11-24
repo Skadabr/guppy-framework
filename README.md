@@ -34,11 +34,6 @@ export class UserController {
 * Logger
 * Native Queue supporting (AMQP)
 
-## Roadmap
-
-* HTTP Client (for microservice communication)
-* DBAL supporting
-
 ## Authors
 
 * Karabutin Alex <karabutinalex@gmail.com>

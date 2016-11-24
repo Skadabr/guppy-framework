@@ -10,6 +10,7 @@ import { MiddlewareRegistry } from "./MiddlewareRegistry";
 import { RouteBuilder } from "./RouteBuilder";
 import { ErrorHandlerRegistry } from "./ErrorHandlerRegistry";
 import { DefaultRouter } from "./DefaultRouter";
+import { ArgumentFetcherRegistry } from "./ArgumentFetcherRegistry";
 
 export class HttpBundle extends Bundle {
 
@@ -34,7 +35,8 @@ export class HttpBundle extends Bundle {
             .service(RouteBuilder, [
                 Container,
                 RouteRegistry,
-                MiddlewareRegistry
+                MiddlewareRegistry,
+                ArgumentFetcherRegistry
             ])
             .service(Router, () => new DefaultRouter(
                 container.get(RouteBuilder)

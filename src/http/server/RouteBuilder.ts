@@ -1,34 +1,17 @@
+import "reflect-metadata";
+
 import { Request, Response } from "..";
 import { Container } from "../../core/Container";
-
-import "reflect-metadata";
 import { MiddlewareRegistry, Middleware, coverAction} from "./MiddlewareRegistry";
 import { RouteAction } from "./Router";
 import { RouteRegistry, RawRoute } from "./RouteRegistry";
+import { ArgumentFetcher, DefaultFetchers, ArgumentFetcherRegistry } from "./ArgumentFetcherRegistry";
 
 export interface RouteHandler {
     method: string;
     route: string;
     handler: (request: Request) => Promise<Response>;
 }
-
-export type ArgumentFetcher<T> = (request: Request) => T;
-
-export const DefaultFetchers = {
-    requestFetcher: (request: Request) => request,
-
-    createStringFetcher(argumentName: string): ArgumentFetcher<string> {
-        return (request: Request) => request.route[argumentName];
-    },
-
-    createNumberFetcher(argumentName: string): ArgumentFetcher<number> {
-        return (request: Request) => parseInt(request.route[argumentName]);
-    },
-
-    createServiceFetcher<T>(service: T): ArgumentFetcher<T> {
-        return (request: Request) => service;
-    }
-};
 
 export function parseFunctionArgumentNames(originalHandler: Function) {
 
@@ -45,7 +28,8 @@ export class RouteBuilder {
     public constructor(
         private container: Container,
         private routeRegistry: RouteRegistry,
-        private middlewareRegistry: MiddlewareRegistry
+        private middlewareRegistry: MiddlewareRegistry,
+        private argumentFetcherRegistry: ArgumentFetcherRegistry
     ) {
     }
 
@@ -159,9 +143,11 @@ export class RouteBuilder {
 
                 default:
                     argumentFetchers.push(
-                        DefaultFetchers.createServiceFetcher(
-                            dependencies.get(argumentTypes[argumentId])
-                        )
+                        this.argumentFetcherRegistry.has(argumentTypes[argumentId])
+                            ? this.argumentFetcherRegistry.get(argumentTypes[argumentId])
+                            : DefaultFetchers.createServiceFetcher(
+                                dependencies.get(argumentTypes[argumentId])
+                            )
                     );
             }
         }
