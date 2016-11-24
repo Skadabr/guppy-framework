@@ -4,7 +4,7 @@ import { Request, Response } from "..";
 import { Container } from "../../core/Container";
 import { MiddlewareRegistry, Middleware, coverAction} from "./MiddlewareRegistry";
 import { RouteAction } from "./Router";
-import { RouteRegistry, RawRoute } from "./RouteRegistry";
+import { RouteRegistry, RawRoute, RoutePrefix } from "./RouteRegistry";
 import { ArgumentFetcher, DefaultFetchers, ArgumentFetcherRegistry } from "./ArgumentFetcherRegistry";
 
 export interface RouteHandler {
@@ -72,7 +72,7 @@ export class RouteBuilder {
             currentRoute = rawRoutes[routeId];
             controllerClass = currentRoute.controllerClass;
             originalHandler = controllerClass.prototype[currentRoute.handlerName];
-            routePrefix = controllerClass["routePrefix"] || "";
+            routePrefix = controllerClass[RoutePrefix] || "";
 
             finalHandler = Object.assign(
                 this.createHandler(

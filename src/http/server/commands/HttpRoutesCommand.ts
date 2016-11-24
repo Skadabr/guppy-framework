@@ -1,7 +1,7 @@
 import { Command }          from "../../../console/Command";
 import { ConsoleInput }     from "../../../console/ConsoleInput";
 import { ConsoleOutput }    from "../../../console/ConsoleOutput";
-import { RouteRegistry }    from "../RouteRegistry";
+import { RouteRegistry, RoutePrefix } from "../RouteRegistry";
 
 import * as Table from "easy-table";
 
@@ -27,8 +27,12 @@ export class HttpRoutesCommand implements Command {
         }
 
         for (const route of routes) {
+
+            const routePrefix = route.controllerClass[RoutePrefix] || "";
+            const routePath = routePrefix + route.route;
+
             table.cell("Method", route.method);
-            table.cell("Url", route.route);
+            table.cell("Url", routePath || "/");
             table.cell("Handler", `${route.controllerClass.name}.${route.handlerName}`);
             table.newRow();
         }

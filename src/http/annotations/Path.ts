@@ -1,3 +1,5 @@
+import { RoutePrefix } from "../server/RouteRegistry";
+
 export function Path(route: string): Function {
     return (targetClass, propertyName) => {
 
@@ -5,6 +7,6 @@ export function Path(route: string): Function {
             throw new Error("Annotation @Path doesn't support using with members");
         }
 
-        targetClass["routePrefix"] = route;
+        targetClass[RoutePrefix] = route;
     };
 }

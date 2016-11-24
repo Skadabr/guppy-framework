@@ -5,6 +5,8 @@ export interface RawRoute {
     handlerName: string;
 }
 
+export const RoutePrefix = Symbol("routePrefix");
+
 export class RouteRegistry {
 
     private static prebootRawRoutes: RawRoute[] = [];

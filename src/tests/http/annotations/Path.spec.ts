@@ -1,7 +1,7 @@
 import assert = require('assert');
 
 import { Path } from "../../../http";
-import { RouteRegistry } from "../../../http/server/RouteRegistry";
+import { RouteRegistry, RoutePrefix } from "../../../http/server/RouteRegistry";
 
 describe('guppy.http.annotations.Path', () => {
 
@@ -14,7 +14,7 @@ describe('guppy.http.annotations.Path', () => {
         @Path('/users')
         class UserController { }
 
-        assert.equal(UserController["routePrefix"], "/users");
+        assert.equal(UserController[RoutePrefix], "/users");
     });
 
     it("does not support using with members", () => {
