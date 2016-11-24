@@ -54,7 +54,8 @@ export class RouteBuilder {
 
                 if (argumentsTypes[argumentId] === String
                     || argumentsTypes[argumentId] === Number
-                    || argumentsTypes[argumentId] === Request) continue;
+                    || argumentsTypes[argumentId] === Request
+                    || this.argumentFetcherRegistry.has(argumentsTypes[argumentId])) continue;
 
                 dependencies.set(argumentsTypes[argumentId], this.container.get(argumentsTypes[argumentId]));
             }
