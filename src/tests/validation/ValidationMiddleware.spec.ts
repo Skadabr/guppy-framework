@@ -1,9 +1,9 @@
 import assert = require("assert");
 
 import { Form, field, ValidationMiddleware } from "../../validation";
-import { Request } from "../../http";
-import { Response } from "../../http/Response";
-import {IncomingMessage} from "http";
+import { Request, Response } from "../../http";
+import { OriginalAction } from "../../http/server";
+import { IncomingMessage } from "http";
 
 function mock<T>(data?: Object): T {
     return <T> (data || {});
@@ -25,7 +25,7 @@ describe("guppy.validation.ValidationMiddleware", () => {
             }
         }
 
-        UserController.prototype.store["original"] = UserController.prototype.store;
+        UserController.prototype.store[OriginalAction] = UserController.prototype.store;
 
         const validationMiddleware = new ValidationMiddleware();
 
@@ -72,7 +72,7 @@ describe("guppy.validation.ValidationMiddleware", () => {
             }
         }
 
-        UserController.prototype.store["original"] = UserController.prototype.store;
+        UserController.prototype.store[OriginalAction] = UserController.prototype.store;
 
         const validationMiddleware = new ValidationMiddleware();
 

@@ -1,6 +1,6 @@
 import assert = require("assert");
 
-import { MiddlewareRegistry, RouteAction, coverAction } from "../../../http/server";
+import { MiddlewareRegistry, RouteAction, coverAction, OriginalAction } from "../../../http/server";
 import { Request, Response } from "../../../http";
 
 function mock<T>(data?: Object): T {
@@ -48,7 +48,7 @@ describe("guppy.http.server.coverAction", () => {
 
         const finalHandler = coverAction(middleware, requestHandler);
 
-        assert.equal(finalHandler["original"], requestHandler);
+        assert.equal(finalHandler[OriginalAction], requestHandler);
 
         return finalHandler(mock<Request>())
             .then((response: Response) => {

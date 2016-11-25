@@ -1,5 +1,7 @@
 import { Field } from "./Field";
 
+export const FormConstraintsSet = Symbol("validation.constraints");
+
 export function Form(...fields: Field[]): Function {
 
     return (classDefinition, propertyName) => {
@@ -8,6 +10,6 @@ export function Form(...fields: Field[]): Function {
             throw new Error("Annotation @Form doesn't support using with classes.");
         }
 
-        classDefinition[propertyName].constraints = fields;
+        classDefinition[propertyName][FormConstraintsSet] = fields;
     };
 }
