@@ -72,6 +72,55 @@ describe("guppy.validation.Field", () => {
         assert.equal(data["myField"], "my string");
     });
 
+    it("requires a valid value as an int", () => {
+        const field = new Field("myField").toInt();
+        const data = {
+            myField: "foo"
+        };
+
+        assert.throws(
+            () => field.validate(data),
+            /Field "myField" must be an integer./
+        );
+    });
+
+    it("converts a passed value to an int", () => {
+        const field = new Field("myField").toInt();
+        const data = {
+            myField: "15"
+        };
+
+        field.validate(data);
+
+        assert.equal(data["myField"], 15);
+    });
+
+    it("converts a passed value to a Date", () => {
+        const field = new Field("myField").toDate();
+        const data = {
+            myField: "2016-11-25T14:57:33.442Z"
+        };
+
+        field.validate(data);
+
+        const given: Date = data["myField"] as any;
+
+        assert.ok(given instanceof Date);
+        assert.equal(given.toISOString(), "2016-11-25T14:57:33.442Z");
+    });
+
+    it("requires a date value in ISO format", () => {
+        const field = new Field("myField").toDate();
+        const data = {
+            myField: "foo"
+        };
+
+        assert.throws(
+            () => field.validate(data),
+            /Field "myField" must has ISO format./
+        );
+    });
+
     it("skips an ommited string", () => {
         const field = new Field("myField").trim();
         const data = { };

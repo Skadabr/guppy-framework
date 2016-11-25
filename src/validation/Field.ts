@@ -2,6 +2,7 @@ export type Constraint = (value: any) => any;
 export type Violation = Error;
 
 const EMAIL_PATTERN = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const DATE_PATTERN = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
 
 export class Field {
 
@@ -18,6 +19,42 @@ export class Field {
             if (typeof value === "undefined") return;
 
             return value.toString().trim();
+        });
+
+        return this;
+    }
+
+    public toInt(): Field {
+
+        this._constraints.add((value: any) => {
+            if (value) {
+                if (typeof value !== "number") {
+                    value = value.toString();
+
+                    if (!value.match(/^\d+$/)) throw new Error(`Field "${this._fieldName}" must be an integer.`);
+
+                    value = parseInt(value);
+                }
+
+                return value;
+            }
+        });
+
+        return this;
+    }
+
+    public toDate(): Field {
+
+        this._constraints.add((value: any) => {
+            if (value) {
+                if (!(value instanceof Date)) {
+                    value = value.toString();
+                    if (!value.match(DATE_PATTERN)) throw new Error(`Field "${this._fieldName}" must has ISO format.`);
+                    value = new Date(value);
+                }
+
+                return value;
+            }
         });
 
         return this;
