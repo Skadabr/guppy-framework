@@ -2,7 +2,7 @@ import "reflect-metadata";
 
 import { Request, Response } from "..";
 import { Container } from "../../core/Container";
-import { MiddlewareRegistry, Middleware, coverAction} from "./MiddlewareRegistry";
+import { MiddlewareRegistry, Middleware, coverAction, OriginalAction } from "./MiddlewareRegistry";
 import { RouteAction } from "./Router";
 import { RouteRegistry, RawRoute, RoutePrefix } from "./RouteRegistry";
 import { ArgumentFetcher, DefaultFetchers, ArgumentFetcherRegistry } from "./ArgumentFetcherRegistry";
@@ -74,18 +74,17 @@ export class RouteBuilder {
             originalHandler = controllerClass.prototype[currentRoute.handlerName];
             routePrefix = controllerClass[RoutePrefix] || "";
 
-            finalHandler = Object.assign(
-                this.createHandler(
-                    dependencies.get(currentRoute.controllerClass),
-                    originalHandler,
-                    this.createArgumentFetchers(
-                        parseFunctionArgumentNames(originalHandler),
-                        this.getArgumentTypes(controllerClass, currentRoute.handlerName),
-                        dependencies
-                    )
-                ),
-                { original: originalHandler }
+            finalHandler = this.createHandler(
+                dependencies.get(currentRoute.controllerClass),
+                originalHandler,
+                this.createArgumentFetchers(
+                    parseFunctionArgumentNames(originalHandler),
+                    this.getArgumentTypes(controllerClass, currentRoute.handlerName),
+                    dependencies
+                )
             );
+
+            finalHandler[OriginalAction] = originalHandler;
 
             for (let middlewareId in middlewares) {
                 finalHandler = coverAction(middlewares[middlewareId], finalHandler);
