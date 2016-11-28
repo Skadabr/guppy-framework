@@ -1,7 +1,4 @@
 # Guppy
-[![Version](https://img.shields.io/npm/v/guppy.svg)](https://www.npmjs.com/package/guppy)
-[![Travis CI](https://img.shields.io/travis/nexode/guppy-framework.svg)](https://travis-ci.org/nexode/guppy-framework)
-[![Coverage Status](https://img.shields.io/coveralls/nexode/guppy-framework.svg)](https://coveralls.io/github/nexode/guppy-framework)
 
 [![Join the chat at https://gitter.im/guppy-framework/guppy](https://img.shields.io/gitter/room/nexode/guppy-framework.svg)](https://gitter.im/guppy-framework/guppy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -10,7 +7,7 @@ Guppy is a platform for micro-service development on TypeScript.
 [Here](https://github.com/nexode/guppy-boilerplate) you can get a boilerplate.
 
 ```typescript
-import { Get, Response } from "guppy/http";
+import { Get, Response } from "guppy-http";
 
 export class UserController {
 

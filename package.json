@@ -1,6 +1,6 @@
 {
   "name": "guppy",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "Guppy Framework",
   "repository": {
     "type": "git",
@@ -8,35 +8,11 @@
   },
   "scripts": {
     "build": "tsc",
-    "unit": "tsc && mocha --recursive dist/tests",
-    "lint": "tslint ./src/**/*.ts",
-    "test": "npm run unit && npm run lint",
-    "coverage": "tsc && istanbul --include-all-sources cover _mocha -- --recursive ./dist/tests",
-    "coverage-html": "npm run coverage && remap-istanbul -i ./coverage/coverage.json -o ./coverage/html-report -t html",
-    "coverage-lcov": "npm run coverage && remap-istanbul -i ./coverage/coverage.json -o ./coverage/lcov.info -t lcovonly",
-    "coveralls": "npm run coverage-lcov && cat ./coverage/lcov.info | coveralls"
+    "test": "tsc"
   },
   "main": "index.js",
   "author": "Karabutin Alex <karabutinalex@gmail.com>",
   "license": "MIT",
-  "devDependencies": {
-    "coveralls": "^2.11.14",
-    "istanbul": "^0.4.5",
-    "mocha": "^3.1.2",
-    "mocha-lcov-reporter": "^1.2.0",
-    "node-fetch": "^1.6.1",
-    "remap-istanbul": "^0.7.0",
-    "ts-node": "^1.6.0",
-    "tslint": "^3.15.1"
-  },
-  "dependencies": {
-    "amqplib": "^0.5.0",
-    "chai": "^3.5.0",
-    "colors": "^1.1.2",
-    "easy-table": "^1.0.0",
-    "glob": "^7.0.6",
-    "log4js": "^1.0.1",
-    "mysql": "^2.12.0",
-    "reflect-metadata": "^0.1.8"
-  }
+  "devDependencies": {},
+  "dependencies": {}
 }

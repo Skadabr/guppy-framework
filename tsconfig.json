@@ -11,7 +11,7 @@
         "emitDecoratorMetadata": true,
         "stripInternal": true,
         "removeComments": false,
-        "noResolve": true,
+        "noResolve": false,
         "noImplicitReturns": true
     }
 }

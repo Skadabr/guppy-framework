@@ -1,1 +1,7 @@
-export const VERSION = "1.0.20";
+throw new Error(
+    `Deprecated package. Please use these packages:
+
+    * guppy-core
+    * guppy-console)
+    * guppy-http
+`);

@@ -5,11 +5,7 @@ node_js:
 before_install:
   - "npm config set spin false"
   - "npm install -g typescript@2.0.3"
-  - "npm install -g typings"
 install:
   - "npm install"
   - "npm link typescript"
-  - "typings install"
   - "npm run build"
-after_success:
-  - "npm run coveralls"
